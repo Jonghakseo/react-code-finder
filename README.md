@@ -11,7 +11,8 @@ Perfect for passing UI context to AI coding assistants like Claude Code, Cursor,
 - Hover over any component to see its name and source location
 - Click to copy source location to clipboard (e.g., `src/components/Button.tsx:42:10`)
 - Supports React 18 & 19
-- Works with Vite and Next.js
+- Works with Vite and Next.js (Pages Router & App Router)
+- Full support for React Server Components (RSC)
 
 ## Installation
 
@@ -104,7 +105,6 @@ withReactCodeFinder({
 
 - Development mode only (disabled in production builds)
 - Next.js Turbopack not supported (Webpack only)
-- React Server Components not supported (Client Components only)
 
 ## License
 
