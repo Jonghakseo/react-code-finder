@@ -1,6 +1,6 @@
 {
   "name": "@react-code-finder/core",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Inspect React components and copy source locations to clipboard",
   "type": "module",
   "main": "./dist/index.js",

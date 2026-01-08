@@ -1,6 +1,6 @@
 {
   "name": "@react-code-finder/nextjs",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Next.js plugin for react-code-finder - Inspect React components and copy source locations",
   "type": "module",
   "main": "./dist/index.js",
