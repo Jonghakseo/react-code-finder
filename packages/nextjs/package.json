@@ -1,7 +1,7 @@
 {
   "name": "@react-code-finder/nextjs",
   "version": "0.0.1",
-  "description": "Next.js plugin for react-code-finder",
+  "description": "Next.js plugin for react-code-finder - Inspect React components and copy source locations",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -25,11 +25,21 @@
   "keywords": [
     "react",
     "nextjs",
+    "next-plugin",
     "devtools",
     "inspector"
   ],
-  "author": "",
+  "author": "Jonghakseo",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jonghakseo/react-code-finder",
+    "directory": "packages/nextjs"
+  },
+  "homepage": "https://github.com/Jonghakseo/react-code-finder#readme",
+  "bugs": {
+    "url": "https://github.com/Jonghakseo/react-code-finder/issues"
+  },
   "dependencies": {
     "@react-code-finder/core": "workspace:*"
   },

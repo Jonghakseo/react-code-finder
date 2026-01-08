@@ -1,7 +1,7 @@
 {
   "name": "@react-code-finder/core",
   "version": "0.0.1",
-  "description": "Core library for react-code-finder",
+  "description": "Inspect React components and copy source locations to clipboard",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -31,8 +31,19 @@
   "keywords": [
     "react",
     "devtools",
-    "inspector"
+    "inspector",
+    "component",
+    "source-location"
   ],
-  "author": "",
-  "license": "MIT"
+  "author": "Jonghakseo",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jonghakseo/react-code-finder",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/Jonghakseo/react-code-finder#readme",
+  "bugs": {
+    "url": "https://github.com/Jonghakseo/react-code-finder/issues"
+  }
 }

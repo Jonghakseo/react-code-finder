@@ -4,7 +4,14 @@
   "private": true,
   "scripts": {
     "build": "pnpm --filter './packages/*' build",
-    "dev": "pnpm -r --parallel dev"
+    "dev": "pnpm -r --parallel dev",
+    "version:patch": "pnpm --filter './packages/*' exec npm version patch",
+    "version:minor": "pnpm --filter './packages/*' exec npm version minor",
+    "version:major": "pnpm --filter './packages/*' exec npm version major",
+    "publish:all": "pnpm build && pnpm --filter './packages/*' publish --access public",
+    "release:patch": "pnpm version:patch && pnpm publish:all",
+    "release:minor": "pnpm version:minor && pnpm publish:all",
+    "release:major": "pnpm version:major && pnpm publish:all"
   },
   "devDependencies": {
     "tsup": "^8.0.0",

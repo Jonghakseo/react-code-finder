@@ -15,12 +15,16 @@ Perfect for passing UI context to AI coding assistants like Claude Code, Cursor,
 
 ## Installation
 
+### Vite
+
 ```bash
-npm install react-code-finder --save-dev
-# or
-pnpm add react-code-finder -D
-# or
-yarn add react-code-finder --dev
+npm install @react-code-finder/vite --save-dev
+```
+
+### Next.js
+
+```bash
+npm install @react-code-finder/nextjs --save-dev
 ```
 
 ## Usage
@@ -31,7 +35,7 @@ yarn add react-code-finder --dev
 // vite.config.ts
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { reactCodeFinder } from 'react-code-finder/vite'
+import { reactCodeFinder } from '@react-code-finder/vite'
 
 export default defineConfig({
   plugins: [react(), reactCodeFinder()],
@@ -42,7 +46,7 @@ export default defineConfig({
 
 ```javascript
 // next.config.js
-const { withReactCodeFinder } = require('react-code-finder/next')
+const { withReactCodeFinder } = require('@react-code-finder/nextjs')
 
 module.exports = withReactCodeFinder()({
   // your next.js config
@@ -53,7 +57,7 @@ Or with ES Modules:
 
 ```javascript
 // next.config.mjs
-import { withReactCodeFinder } from 'react-code-finder/next'
+import { withReactCodeFinder } from '@react-code-finder/nextjs'
 
 export default withReactCodeFinder()({
   // your next.js config

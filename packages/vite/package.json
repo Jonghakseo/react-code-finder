@@ -1,7 +1,7 @@
 {
   "name": "@react-code-finder/vite",
   "version": "0.0.1",
-  "description": "Vite plugin for react-code-finder",
+  "description": "Vite plugin for react-code-finder - Inspect React components and copy source locations",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -22,11 +22,21 @@
   "keywords": [
     "react",
     "vite",
+    "vite-plugin",
     "devtools",
     "inspector"
   ],
-  "author": "",
+  "author": "Jonghakseo",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jonghakseo/react-code-finder",
+    "directory": "packages/vite"
+  },
+  "homepage": "https://github.com/Jonghakseo/react-code-finder#readme",
+  "bugs": {
+    "url": "https://github.com/Jonghakseo/react-code-finder/issues"
+  },
   "dependencies": {
     "@react-code-finder/core": "workspace:*"
   },
