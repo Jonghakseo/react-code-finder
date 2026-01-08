@@ -83,13 +83,22 @@ export function withReactCodeFinder(options: ReactCodeFinderOptions = {}) {
 
             const optionsScript = `data:text/javascript,window.__REACT_CODE_FINDER_OPTIONS__=${JSON.stringify({ buttonPosition })};`
 
+            const hasClientEntry = (entry: string) =>
+              entry.includes('client-entry') || entry.includes('__REACT_CODE_FINDER_OPTIONS__')
+
             if (
               entries['main.js'] &&
-              !entries['main.js'].some((e: string) =>
-                e.includes('react-code-finder')
-              )
+              !entries['main.js'].some(hasClientEntry)
             ) {
               entries['main.js'].unshift(optionsScript, clientEntryPath)
+            }
+
+            if (
+              entries['main-app'] &&
+              Array.isArray(entries['main-app']) &&
+              !entries['main-app'].some(hasClientEntry)
+            ) {
+              entries['main-app'].unshift(optionsScript, clientEntryPath)
             }
 
             return entries

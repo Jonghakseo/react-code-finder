@@ -15,6 +15,34 @@ importers:
         specifier: ^5.0.0
         version: 5.9.3
 
+  examples/nextjs-app-router:
+    dependencies:
+      '@react-code-finder/nextjs':
+        specifier: workspace:*
+        version: link:../../packages/nextjs
+      next:
+        specifier: ^15.0.0
+        version: 15.5.9(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.3
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.3(react@19.2.3)
+    devDependencies:
+      '@types/node':
+        specifier: ^20
+        version: 20.19.27
+      '@types/react':
+        specifier: ^19
+        version: 19.2.7
+      '@types/react-dom':
+        specifier: ^19
+        version: 19.2.3(@types/react@19.2.7)
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
   examples/nextjs-react18:
     dependencies:
       '@react-code-finder/nextjs':
@@ -191,7 +219,11 @@ importers:
         version: link:../core
       vite:
         specifier: '>=4.0.0'
-        version: 7.3.1(@types/node@24.10.4)
+        version: 7.3.1(@types/node@20.19.27)
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.27
 
 packages:
 
@@ -3129,6 +3161,18 @@ snapshots:
   uri-js@4.4.1:
     dependencies:
       punycode: 2.3.1
+
+  vite@7.3.1(@types/node@20.19.27):
+    dependencies:
+      esbuild: 0.27.2
+      fdir: 6.5.0(picomatch@4.0.3)
+      picomatch: 4.0.3
+      postcss: 8.5.6
+      rollup: 4.55.1
+      tinyglobby: 0.2.15
+    optionalDependencies:
+      '@types/node': 20.19.27
+      fsevents: 2.3.3
 
   vite@7.3.1(@types/node@24.10.4):
     dependencies:
