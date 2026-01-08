@@ -9,9 +9,10 @@
     "version:minor": "pnpm --filter './packages/*' exec npm version minor",
     "version:major": "pnpm --filter './packages/*' exec npm version major",
     "publish:all": "pnpm build && pnpm --filter './packages/*' publish --access public",
-    "release:patch": "pnpm version:patch && pnpm publish:all",
-    "release:minor": "pnpm version:minor && pnpm publish:all",
-    "release:major": "pnpm version:major && pnpm publish:all"
+    "tag": "git tag v$(node -p \"require('./packages/core/package.json').version\") && git push origin v$(node -p \"require('./packages/core/package.json').version\")",
+    "release:patch": "pnpm version:patch && pnpm publish:all && pnpm tag",
+    "release:minor": "pnpm version:minor && pnpm publish:all && pnpm tag",
+    "release:major": "pnpm version:major && pnpm publish:all && pnpm tag"
   },
   "devDependencies": {
     "tsup": "^8.0.0",
