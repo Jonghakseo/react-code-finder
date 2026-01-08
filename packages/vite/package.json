@@ -1,0 +1,40 @@
+{
+  "name": "@react-code-finder/vite",
+  "version": "0.0.1",
+  "description": "Vite plugin for react-code-finder",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "keywords": [
+    "react",
+    "vite",
+    "devtools",
+    "inspector"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@react-code-finder/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "vite": ">=4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  }
+}

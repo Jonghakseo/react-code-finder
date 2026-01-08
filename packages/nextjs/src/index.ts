@@ -1,5 +1,9 @@
-import type { ReactCodeFinderOptions } from './core/types'
-import { resolve } from 'node:path'
+import { join } from 'node:path'
+
+export interface ReactCodeFinderOptions {
+  enabled?: boolean
+  buttonPosition?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
+}
 
 interface NextConfig {
   webpack?: (config: WebpackConfig, context: WebpackContext) => WebpackConfig
@@ -32,7 +36,7 @@ interface WebpackRule {
 }
 
 function getLoaderPath(): string {
-  return require.resolve('react-code-finder/jsx-transform-loader')
+  return join(__dirname, 'loader.cjs')
 }
 
 export function withReactCodeFinder(options: ReactCodeFinderOptions = {}) {
@@ -56,7 +60,7 @@ export function withReactCodeFinder(options: ReactCodeFinderOptions = {}) {
           }
 
           config.module.rules.push({
-            test: /react-jsx-dev-runtime\.development\.js$/,
+            test: /jsx-dev-runtime\.js$/,
             enforce: 'pre',
             use: [{ loader: getLoaderPath() }],
           })
@@ -72,7 +76,7 @@ export function withReactCodeFinder(options: ReactCodeFinderOptions = {}) {
             const clientEntry = `
               (function() {
                 if (typeof window !== 'undefined') {
-                  import('react-code-finder').then(({ Inspector }) => {
+                  import('@react-code-finder/core').then(({ Inspector }) => {
                     window.__REACT_CODE_FINDER__ = new Inspector({
                       enabled: true,
                       buttonPosition: '${buttonPosition}',
@@ -85,7 +89,7 @@ export function withReactCodeFinder(options: ReactCodeFinderOptions = {}) {
 
             if (
               entries['main.js'] &&
-              !entries['main.js'].includes('react-code-finder')
+              !entries['main.js'].includes('@react-code-finder')
             ) {
               entries['main.js'].unshift(
                 `data:text/javascript,${encodeURIComponent(clientEntry)}`

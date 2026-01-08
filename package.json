@@ -1,0 +1,13 @@
+{
+  "name": "react-code-finder-monorepo",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "pnpm --filter './packages/*' build",
+    "dev": "pnpm -r --parallel dev"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  }
+}

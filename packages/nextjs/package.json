@@ -1,0 +1,43 @@
+{
+  "name": "@react-code-finder/nextjs",
+  "version": "0.0.1",
+  "description": "Next.js plugin for react-code-finder",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./loader": {
+      "require": "./dist/loader.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "keywords": [
+    "react",
+    "nextjs",
+    "devtools",
+    "inspector"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@react-code-finder/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "next": ">=12.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  }
+}

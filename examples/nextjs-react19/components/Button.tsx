@@ -38,6 +38,7 @@ export function Button({ children, variant = 'primary', onClick }: ButtonProps) 
         ...styles[variant],
       }}
     >
+      {/* @ts-ignore */}
       {children}
     </button>
   )

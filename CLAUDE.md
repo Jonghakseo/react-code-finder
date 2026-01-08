@@ -5,40 +5,61 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Build Commands
 
 ```bash
-# Build the library (in react-code-finder/)
-cd react-code-finder && pnpm build
+# Install dependencies
+pnpm install
 
-# Watch mode for development
-cd react-code-finder && pnpm dev
+# Build all packages
+pnpm build
+
+# Build specific package
+pnpm -F @react-code-finder/core build
+pnpm -F @react-code-finder/vite build
+pnpm -F @react-code-finder/nextjs build
+
+# Run example
+pnpm -F example-vite-react19 dev
 ```
 
 ## Architecture
 
-React component source code finder for development. Displays component names and source locations on hover, copies to clipboard on click.
+React component source code finder for development. Displays component names and source locations on hover, copies to clipboard on click. Copies component stack trace (up to 3 levels) for AI coding assistant context.
 
-### Structure
+### Monorepo Structure
 
-- `react-code-finder/` - Main library package
-- `examples/` - Example apps (nextjs-react18, nextjs-react19, vite-react18, vite-react19)
+```
+packages/
+  core/     # @react-code-finder/core - Inspector, fiber hooking, source extraction
+  vite/     # @react-code-finder/vite - Vite plugin
+  nextjs/   # @react-code-finder/nextjs - Next.js plugin + webpack loader
+examples/
+  vite-react18/
+  vite-react19/
+  nextjs-react18/
+  nextjs-react19/
+```
 
-### Core Modules
+### Package Dependencies
 
-**Build System (tsup)**
-- `index` - Main entry, exports `Inspector` class
-- `vite-plugin` - Vite plugin entry (`react-code-finder/vite`)
-- `next-plugin` - Next.js plugin entry (`react-code-finder/next`)
-- `client-bundle` - IIFE bundle for browser injection
-- `jsx-transform-loader` - Webpack loader for Next.js
+```
+@react-code-finder/vite   → @react-code-finder/core
+@react-code-finder/nextjs → @react-code-finder/core
+```
 
-**Runtime Flow**
+### Core Package (`packages/core`)
 
-1. **JSX Transform** (`transform.ts`): Patches `jsx-dev-runtime.js` to preserve source location in React 19's `_debugInfo` (React 18 uses `_debugSource` natively)
+- `src/core/types.ts` - Fiber, SourceLocation types
+- `src/core/fiber.ts` - React DevTools hook interception, fiber tree traversal
+- `src/core/source.ts` - Source location extraction, component stack building
+- `src/client/inspector.ts` - Main Inspector class, event handling
+- `src/client/overlay.ts` - Hover overlay UI
+- `src/transform.ts` - JSX runtime patching for React 19
 
-2. **Fiber Hooking** (`core/fiber.ts`): Intercepts `__REACT_DEVTOOLS_GLOBAL_HOOK__.onCommitFiberRoot` to track fiber tree updates and map DOM elements to fibers
+### Runtime Flow
 
-3. **Source Extraction** (`core/source.ts`): Traverses fiber's `_debugOwner` chain to find user components (excluding node_modules) and extract `SourceLocation`
-
-4. **Inspector** (`client/inspector.ts`): Manages hover overlay, click-to-copy, and toggle button UI
+1. **JSX Transform**: Patches `jsx-dev-runtime.js` to preserve source location in React 19's `_debugInfo`
+2. **Fiber Hooking**: Intercepts `__REACT_DEVTOOLS_GLOBAL_HOOK__.onCommitFiberRoot`
+3. **Source Extraction**: Traverses fiber's `_debugOwner` chain, builds component stack (max 3 levels)
+4. **Click Handler**: Copies formatted stack trace to clipboard
 
 ### React Version Differences
 

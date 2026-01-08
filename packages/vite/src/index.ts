@@ -1,14 +1,20 @@
 import type { Plugin } from 'vite'
-import type { ReactCodeFinderOptions } from './core/types'
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { transformJsxDevRuntime } from './transform'
+import { createRequire } from 'node:module'
+import { transformJsxDevRuntime } from '@react-code-finder/core/transform'
+
+export interface ReactCodeFinderOptions {
+  enabled?: boolean
+  buttonPosition?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
+}
 
 function getClientBundle(): string {
   try {
-    const __dirname = dirname(fileURLToPath(import.meta.url))
-    const bundlePath = join(__dirname, 'client-bundle.global.js')
+    const require = createRequire(import.meta.url)
+    const corePath = require.resolve('@react-code-finder/core')
+    const bundlePath = join(dirname(corePath), 'client-bundle.global.js')
     return readFileSync(bundlePath, 'utf-8')
   } catch {
     return ''

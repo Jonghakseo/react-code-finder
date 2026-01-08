@@ -1,0 +1,39 @@
+{
+  "name": "@react-code-finder/core",
+  "version": "0.0.1",
+  "description": "Core library for react-code-finder",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./transform": {
+      "types": "./dist/transform.d.ts",
+      "import": "./dist/transform.js",
+      "require": "./dist/transform.cjs"
+    },
+    "./client-bundle": {
+      "import": "./dist/client-bundle.global.js",
+      "require": "./dist/client-bundle.global.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "keywords": [
+    "react",
+    "devtools",
+    "inspector"
+  ],
+  "author": "",
+  "license": "MIT"
+}

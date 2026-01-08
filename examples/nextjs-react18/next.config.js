@@ -1,4 +1,4 @@
-const { withReactCodeFinder } = require('react-code-finder/next')
+const { withReactCodeFinder } = require('@react-code-finder/nextjs')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
