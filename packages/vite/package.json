@@ -17,8 +17,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch"
+    "build": "tsup"
   },
   "keywords": [
     "react",
