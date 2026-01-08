@@ -1,13 +1,17 @@
 # react-code-finder
 
-React 컴포넌트의 소스 코드 위치를 브라우저에서 확인하고 클립보드에 복사하는 개발 도구.
+English | [한국어](./README-ko.md)
+
+Inspect React components in your browser and copy their source locations to clipboard with a single click.
+
+Perfect for passing UI context to AI coding assistants like Claude Code, Cursor, or GitHub Copilot — just hover, click, and paste the component path directly into your prompt.
 
 ## Features
 
-- 마우스 오버 시 컴포넌트 이름과 소스 위치 표시
-- 클릭 시 소스 위치 클립보드 복사 (예: `src/components/Button.tsx:42:10`)
-- React 18, 19 지원
-- Vite, Next.js 지원
+- Hover over any component to see its name and source location
+- Click to copy source location to clipboard (e.g., `src/components/Button.tsx:42:10`)
+- Supports React 18 & 19
+- Works with Vite and Next.js
 
 ## Installation
 
@@ -45,7 +49,7 @@ module.exports = withReactCodeFinder()({
 })
 ```
 
-또는 ES Module 형식:
+Or with ES Modules:
 
 ```javascript
 // next.config.mjs
@@ -60,9 +64,9 @@ export default withReactCodeFinder()({
 
 ```typescript
 interface ReactCodeFinderOptions {
-  // 활성화 여부 (default: true)
+  // Enable/disable the inspector (default: true)
   enabled?: boolean
-  // 토글 버튼 위치 (default: 'bottom-right')
+  // Toggle button position (default: 'bottom-right')
   buttonPosition?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
 }
 ```
@@ -87,16 +91,16 @@ withReactCodeFinder({
 
 ## How It Works
 
-1. 개발 서버 실행 시 화면 우측 하단에 토글 버튼이 표시됩니다.
-2. 버튼을 클릭하면 Inspector 모드가 활성화됩니다.
-3. 컴포넌트 위에 마우스를 올리면 컴포넌트 이름과 소스 위치가 오버레이로 표시됩니다.
-4. 클릭하면 소스 위치가 클립보드에 복사됩니다.
+1. A toggle button appears at the bottom-right corner when the dev server starts.
+2. Click the button to activate Inspector mode.
+3. Hover over components to see their names and source locations in an overlay.
+4. Click to copy the source location to your clipboard.
 
 ## Limitations
 
-- 개발 모드에서만 동작합니다 (production 빌드에서는 비활성화)
-- Next.js Turbopack 미지원 (Webpack만 지원)
-- React Server Components는 지원하지 않습니다 (Client Components만 지원)
+- Development mode only (disabled in production builds)
+- Next.js Turbopack not supported (Webpack only)
+- React Server Components not supported (Client Components only)
 
 ## License
 
