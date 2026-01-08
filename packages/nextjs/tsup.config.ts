@@ -13,4 +13,11 @@ export default defineConfig([
     format: ['cjs'],
     clean: false,
   },
+  {
+    entry: ['src/client-entry.ts'],
+    format: ['cjs'],
+    outExtension: () => ({ js: '.js' }),
+    clean: false,
+    noExternal: ['@react-code-finder/core'],
+  },
 ])

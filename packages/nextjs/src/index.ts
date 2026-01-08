@@ -15,6 +15,9 @@ interface WebpackConfig {
   module?: {
     rules?: WebpackRule[]
   }
+  resolve?: {
+    alias?: Record<string, string>
+  }
   [key: string]: unknown
 }
 
@@ -37,6 +40,10 @@ interface WebpackRule {
 
 function getLoaderPath(): string {
   return join(__dirname, 'loader.cjs')
+}
+
+function getClientEntryPath(): string {
+  return join(__dirname, 'client-entry.js')
 }
 
 export function withReactCodeFinder(options: ReactCodeFinderOptions = {}) {
@@ -66,6 +73,7 @@ export function withReactCodeFinder(options: ReactCodeFinderOptions = {}) {
           })
 
           const originalEntry = config.entry
+          const clientEntryPath = getClientEntryPath()
 
           config.entry = async () => {
             const entries =
@@ -73,27 +81,15 @@ export function withReactCodeFinder(options: ReactCodeFinderOptions = {}) {
                 ? await originalEntry()
                 : originalEntry
 
-            const clientEntry = `
-              (function() {
-                if (typeof window !== 'undefined') {
-                  import('@react-code-finder/core').then(({ Inspector }) => {
-                    window.__REACT_CODE_FINDER__ = new Inspector({
-                      enabled: true,
-                      buttonPosition: '${buttonPosition}',
-                    });
-                    window.__REACT_CODE_FINDER__.init();
-                  });
-                }
-              })();
-            `
+            const optionsScript = `data:text/javascript,window.__REACT_CODE_FINDER_OPTIONS__=${JSON.stringify({ buttonPosition })};`
 
             if (
               entries['main.js'] &&
-              !entries['main.js'].includes('@react-code-finder')
-            ) {
-              entries['main.js'].unshift(
-                `data:text/javascript,${encodeURIComponent(clientEntry)}`
+              !entries['main.js'].some((e: string) =>
+                e.includes('react-code-finder')
               )
+            ) {
+              entries['main.js'].unshift(optionsScript, clientEntryPath)
             }
 
             return entries
