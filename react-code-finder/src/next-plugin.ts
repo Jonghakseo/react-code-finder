@@ -56,7 +56,7 @@ export function withReactCodeFinder(options: ReactCodeFinderOptions = {}) {
           }
 
           config.module.rules.push({
-            test: /jsx-dev-runtime\.js$/,
+            test: /react-jsx-dev-runtime\.development\.js$/,
             enforce: 'pre',
             use: [{ loader: getLoaderPath() }],
           })

@@ -178,7 +178,7 @@ export class Inspector {
         const stackText = formatComponentStack(stack)
         copyToClipboard(stackText).then((success) => {
           if (success) {
-            this.toast.show(`Copied ${stack.length} component(s)!`, 'success')
+            this.toast.show('Copied!', 'success')
           } else {
             this.toast.show('Failed to copy', 'info')
           }
