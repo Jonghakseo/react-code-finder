@@ -12,7 +12,7 @@ Perfect for passing UI context to AI coding assistants like Claude Code, Cursor,
 - Click to copy source location to clipboard (e.g., `src/components/Button.tsx:42:10`)
 - Supports React 18 & 19
 - Works with Vite and Next.js (Pages Router & App Router)
-- Full support for React Server Components (RSC)
+- React Server Components (RSC) supported (file path only, no line numbers)
 
 ## Installation
 
