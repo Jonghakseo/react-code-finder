@@ -96,3 +96,43 @@ export function getShortFileName(fileName: string): string {
   const parts = fileName.split('/')
   return parts[parts.length - 1] || fileName
 }
+
+export interface ComponentStackItem {
+  name: string
+  source: SourceLocation | null
+}
+
+export function getComponentStack(fiber: Fiber, maxDepth: number = 3): ComponentStackItem[] {
+  const stack: ComponentStackItem[] = []
+  let current: Fiber | null = fiber
+  const seen = new Set<Fiber>()
+
+  while (current && stack.length < maxDepth) {
+    if (seen.has(current)) break
+    seen.add(current)
+
+    const source = current._debugSource ?? current._debugInfo
+    if (source && !source.fileName.includes('node_modules')) {
+      const name = getFiberTypeName(current)
+      if (name !== 'Unknown') {
+        stack.push({ name, source })
+      }
+    }
+
+    current = current._debugOwner || current.return
+  }
+
+  return stack
+}
+
+export function formatComponentStack(stack: ComponentStackItem[]): string {
+  if (stack.length === 0) return ''
+
+  return stack
+    .map((item, index) => {
+      const prefix = index === 0 ? '' : '  '.repeat(index) + '← '
+      const location = item.source ? formatSourceLocation(item.source) : 'unknown'
+      return `${prefix}${item.name} (${location})`
+    })
+    .join('\n')
+}

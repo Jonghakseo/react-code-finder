@@ -1,5 +1,5 @@
 import type { ReactCodeFinderOptions } from './core/types'
-import { createRequire } from 'node:module'
+import { resolve } from 'node:path'
 
 interface NextConfig {
   webpack?: (config: WebpackConfig, context: WebpackContext) => WebpackConfig
@@ -32,7 +32,6 @@ interface WebpackRule {
 }
 
 function getLoaderPath(): string {
-  const require = createRequire(import.meta.url)
   return require.resolve('react-code-finder/jsx-transform-loader')
 }
 

@@ -9,6 +9,8 @@ import {
   getComponentName,
   findUserComponentFiber,
   formatSourceLocation,
+  getComponentStack,
+  formatComponentStack,
 } from '../core/source'
 import { Overlay } from './overlay'
 import { Toast } from './toast'
@@ -165,19 +167,18 @@ export class Inspector {
     const target = e.target as HTMLElement
     if (this.isInternalElement(target)) return
 
-    // Prevent default and stop propagation immediately
     e.preventDefault()
     e.stopImmediatePropagation()
 
     const fiber = this.findComponentFiber(target)
 
     if (fiber) {
-      const source = getSourceFromFiber(fiber)
-      if (source) {
-        const location = formatSourceLocation(source)
-        copyToClipboard(location).then((success) => {
+      const stack = getComponentStack(fiber, 3)
+      if (stack.length > 0) {
+        const stackText = formatComponentStack(stack)
+        copyToClipboard(stackText).then((success) => {
           if (success) {
-            this.toast.show('Copied!', 'success')
+            this.toast.show(`Copied ${stack.length} component(s)!`, 'success')
           } else {
             this.toast.show('Failed to copy', 'info')
           }
