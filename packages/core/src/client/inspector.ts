@@ -31,6 +31,8 @@ export class Inspector {
     this.options = {
       enabled: options.enabled ?? true,
       buttonPosition: options.buttonPosition ?? 'bottom-right',
+      maxDepth: options.maxDepth ?? 5,
+      skipAnonymous: options.skipAnonymous ?? true,
     }
 
     this.overlay = new Overlay()
@@ -107,7 +109,7 @@ export class Inspector {
       }
 
       if (fiber) {
-        const userFiber = findUserComponentFiber(fiber)
+        const userFiber = findUserComponentFiber(fiber, this.options.skipAnonymous)
         if (userFiber) return userFiber
       }
 
@@ -173,7 +175,7 @@ export class Inspector {
     const fiber = this.findComponentFiber(target)
 
     if (fiber) {
-      const stack = getComponentStack(fiber, 3)
+      const stack = getComponentStack(fiber, this.options.maxDepth, this.options.skipAnonymous)
       if (stack.length > 0) {
         const stackText = formatComponentStack(stack)
         copyToClipboard(stackText).then((success) => {

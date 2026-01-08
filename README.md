@@ -73,6 +73,10 @@ interface ReactCodeFinderOptions {
   enabled?: boolean
   // Toggle button position (default: 'bottom-right')
   buttonPosition?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
+  // Maximum component stack depth to copy (default: 5)
+  maxDepth?: number
+  // Skip anonymous/unknown components in stack trace (default: true)
+  skipAnonymous?: boolean
 }
 ```
 

@@ -93,10 +93,21 @@ function findOwnerComponentName(fiber: Fiber): string | null {
   return null
 }
 
-export function findUserComponentFiber(fiber: Fiber): Fiber | null {
+export function findUserComponentFiber(fiber: Fiber, skipAnonymous: boolean): Fiber | null {
   let current: Fiber | null = fiber
 
   while (current) {
+    const name = getFiberTypeName(current)
+    // Skip anonymous/unknown components if skipAnonymous is enabled
+    if (skipAnonymous && (name === 'Anonymous' || name === 'Unknown')) {
+      if (current._debugOwner && 'type' in current._debugOwner) {
+        current = current._debugOwner as Fiber
+      } else {
+        current = current.return
+      }
+      continue
+    }
+
     // First, try to find fiber with source info
     const source = getSourceFromDebugInfo(current)
     if (source && !source.fileName.includes('node_modules')) {
@@ -105,9 +116,9 @@ export function findUserComponentFiber(fiber: Fiber): Fiber | null {
 
     // Fallback: find user component by type name (for React 19 App Router)
     if (typeof current.type === 'function') {
-      const name = current.type.displayName || current.type.name
-      // Skip anonymous and React internal components
-      if (name && name !== 'Anonymous' && !name.startsWith('_')) {
+      const typeName = current.type.displayName || current.type.name
+      // Skip React internal components
+      if (typeName && !typeName.startsWith('_')) {
         return current
       }
     }
@@ -201,7 +212,7 @@ export interface ComponentStackItem {
   source: SourceLocation | null
 }
 
-export function getComponentStack(fiber: Fiber, maxDepth: number = 3): ComponentStackItem[] {
+export function getComponentStack(fiber: Fiber, maxDepth: number, skipAnonymous: boolean): ComponentStackItem[] {
   const stack: ComponentStackItem[] = []
   const seenNames = new Set<string>()
 
@@ -224,7 +235,8 @@ export function getComponentStack(fiber: Fiber, maxDepth: number = 3): Component
 
       while (currentOwner && stack.length < maxDepth) {
         const name = currentOwner.name || 'Unknown'
-        if (!seenNames.has(name)) {
+        const shouldSkip = skipAnonymous && (name === 'Unknown' || name === 'Anonymous')
+        if (!shouldSkip && !seenNames.has(name)) {
           seenNames.add(name)
           let source = getSourceFromDebugOwner(currentOwner)
           // Fallback: parse from fiber's _debugStack
@@ -242,7 +254,8 @@ export function getComponentStack(fiber: Fiber, maxDepth: number = 3): Component
     const source = getSourceFromDebugInfo(current)
     if (source && !source.fileName.includes('node_modules')) {
       const name = getFiberTypeName(current)
-      if (name !== 'Unknown' && !seenNames.has(name)) {
+      const shouldSkip = skipAnonymous && (name === 'Unknown' || name === 'Anonymous')
+      if (!shouldSkip && !seenNames.has(name)) {
         seenNames.add(name)
         stack.push({ name, source })
       }

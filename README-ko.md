@@ -72,6 +72,10 @@ interface ReactCodeFinderOptions {
   enabled?: boolean
   // 토글 버튼 위치 (default: 'bottom-right')
   buttonPosition?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
+  // 복사할 컴포넌트 스택 최대 깊이 (default: 5)
+  maxDepth?: number
+  // Anonymous/Unknown 컴포넌트를 스택에서 제외 (default: true)
+  skipAnonymous?: boolean
 }
 ```
 
