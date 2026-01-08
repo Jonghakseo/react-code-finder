@@ -66,11 +66,18 @@ export function withReactCodeFinder(options: ReactCodeFinderOptions = {}) {
             config.module.rules = []
           }
 
-          config.module.rules.push({
-            test: /react-jsx-dev-runtime\.development\.js$/,
-            enforce: 'pre',
-            use: [{ loader: getLoaderPath() }],
-          })
+          config.module.rules.push(
+            {
+              test: /react-jsx-dev-runtime\.development\.js$/,
+              enforce: 'pre',
+              use: [{ loader: getLoaderPath() }],
+            },
+            {
+              test: /app-page(-turbo)?\.runtime\.dev\.js$/,
+              enforce: 'pre',
+              use: [{ loader: getLoaderPath() }],
+            }
+          )
 
           const originalEntry = config.entry
           const clientEntryPath = getClientEntryPath()
