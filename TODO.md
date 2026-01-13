@@ -30,9 +30,9 @@
 - [ ] `buttonStyle` - 버튼 커스텀 스타일
 
 ### 5. 패키지별 README
-- [ ] `packages/core/README.md`
-- [ ] `packages/vite/README.md`
-- [ ] `packages/nextjs/README.md`
+- [x] `packages/core/README.md`
+- [x] `packages/vite/README.md`
+- [x] `packages/nextjs/README.md`
 
 ### 6. API 레퍼런스 문서
 - [ ] 내보내는 타입 상세 문서 (`SourceLocation`, `Fiber`, `ReactCodeFinderOptions`)
