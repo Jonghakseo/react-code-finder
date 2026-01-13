@@ -68,7 +68,7 @@ export function reactCodeFinder(options: ReactCodeFinderOptions = {}): Plugin {
                 });
               }
             `,
-            injectTo: 'body',
+            injectTo: 'head-prepend',
           },
         ],
       }

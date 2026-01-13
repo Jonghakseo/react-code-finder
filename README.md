@@ -69,7 +69,7 @@ export default withReactCodeFinder()({
 
 ```typescript
 interface ReactCodeFinderOptions {
-  // Enable/disable the inspector (default: true)
+  // Enable/disable the inspector (default: process.env.NODE_ENV === 'development')
   enabled?: boolean
   // Toggle button position (default: 'bottom-right')
   buttonPosition?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'

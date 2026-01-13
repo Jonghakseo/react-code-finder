@@ -57,7 +57,7 @@ export interface ReactCodeFinderOptions {
   /**
    * Enable or disable the inspector.
    * When disabled, the toggle button and inspector functionality are not rendered.
-   * @default true
+   * @default process.env.NODE_ENV === 'development'
    */
   enabled?: boolean
 

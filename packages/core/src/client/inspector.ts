@@ -29,7 +29,7 @@ export class Inspector {
 
   constructor(options: ReactCodeFinderOptions = {}) {
     this.options = {
-      enabled: options.enabled ?? true,
+      enabled: options.enabled ?? process.env.NODE_ENV === 'development',
       buttonPosition: options.buttonPosition ?? 'bottom-right',
       maxDepth: options.maxDepth ?? 5,
       skipAnonymous: options.skipAnonymous ?? true,

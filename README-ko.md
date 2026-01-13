@@ -68,7 +68,7 @@ export default withReactCodeFinder()({
 
 ```typescript
 interface ReactCodeFinderOptions {
-  // 활성화 여부 (default: true)
+  // 활성화 여부 (default: process.env.NODE_ENV === 'development')
   enabled?: boolean
   // 토글 버튼 위치 (default: 'bottom-right')
   buttonPosition?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
