@@ -101,6 +101,14 @@ export interface ReactCodeFinderOptions {
    * @default false
    */
   showNoSource?: boolean
+
+  /**
+   * Disable the inspector when the Escape key is pressed.
+   * When true (default), pressing Escape while the inspector is enabled will disable it.
+   * Set to false to prevent Escape from disabling the inspector.
+   * @default true
+   */
+  disableOnEscape?: boolean
 }
 
 export interface ReactCodeFinderAPI {

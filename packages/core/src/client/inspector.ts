@@ -39,6 +39,7 @@ export class Inspector {
       skipAnonymous: options.skipAnonymous ?? true,
       debug: options.debug ?? false,
       showNoSource: options.showNoSource ?? false,
+      disableOnEscape: options.disableOnEscape ?? true,
     }
 
     logger.setDebugMode(this.options.debug)
@@ -136,6 +137,7 @@ export class Inspector {
     document.addEventListener('mouseover', this.handleMouseOver, true)
     document.addEventListener('mouseout', this.handleMouseOut, true)
     document.addEventListener('click', this.handleClick, true)
+    document.addEventListener('keydown', this.handleKeyDown, true)
     document.body.style.cursor = 'crosshair'
 
     this.toast.show('Inspector enabled', 'info')
@@ -148,6 +150,7 @@ export class Inspector {
     document.removeEventListener('mouseover', this.handleMouseOver, true)
     document.removeEventListener('mouseout', this.handleMouseOut, true)
     document.removeEventListener('click', this.handleClick, true)
+    document.removeEventListener('keydown', this.handleKeyDown, true)
     document.body.style.cursor = ''
 
     this.currentTarget = null
@@ -273,6 +276,12 @@ export class Inspector {
         logger.error('Error getting component stack:', error)
         this.toast.show('Error occurred', 'info')
       }
+    }
+  }
+
+  private handleKeyDown = (e: KeyboardEvent): void => {
+    if (e.key === 'Escape' && this.options.disableOnEscape) {
+      this.disable()
     }
   }
 

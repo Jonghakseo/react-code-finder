@@ -10,10 +10,18 @@ declare global {
 }
 
 if (typeof window !== 'undefined') {
-  const options = window.__REACT_CODE_FINDER_OPTIONS__ || {}
-  window.__REACT_CODE_FINDER__ = new Inspector({
-    enabled: true,
-    buttonPosition: options.buttonPosition || 'bottom-right',
-  })
-  window.__REACT_CODE_FINDER__.init()
+  const initCodeFinder = () => {
+    const options = window.__REACT_CODE_FINDER_OPTIONS__ || {}
+    window.__REACT_CODE_FINDER__ = new Inspector({
+      enabled: true,
+      buttonPosition: options.buttonPosition || 'bottom-right',
+    })
+    window.__REACT_CODE_FINDER__.init()
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCodeFinder)
+  } else {
+    initCodeFinder()
+  }
 }

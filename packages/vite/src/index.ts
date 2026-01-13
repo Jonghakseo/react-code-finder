@@ -62,10 +62,17 @@ export function reactCodeFinder(options: ReactCodeFinderOptions = {}): Plugin {
             children: `
               ${bundle}
               if (typeof window !== 'undefined' && window.ReactCodeFinder) {
-                window.__REACT_CODE_FINDER__ = window.ReactCodeFinder.init({
-                  enabled: true,
-                  buttonPosition: '${buttonPosition}',
-                });
+                var initCodeFinder = function() {
+                  window.__REACT_CODE_FINDER_INSTANCE__ = window.ReactCodeFinder.init({
+                    enabled: true,
+                    buttonPosition: '${buttonPosition}',
+                  });
+                };
+                if (document.readyState === 'loading') {
+                  document.addEventListener('DOMContentLoaded', initCodeFinder);
+                } else {
+                  initCodeFinder();
+                }
               }
             `,
             injectTo: 'head-prepend',
