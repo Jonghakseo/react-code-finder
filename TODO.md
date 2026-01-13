@@ -6,10 +6,9 @@
 - [x] DevTools 훅 인터셉션 실패 시 사용자 피드백 추가
 - [x] 소스 위치를 찾지 못한 컴포넌트에 대한 안내 메시지 (`showNoSource` 옵션)
 - [x] 설정 옵션 유효성 검사 (잘못된 `buttonPosition` 등)
-- [ ] `onError` 콜백 옵션 추가
 
 ### 2. 프로그래매틱 API
-- [ ] 전역 API 노출 (`window.__REACT_CODE_FINDER__`)
+- [x] 전역 API 노출 (`window.__REACT_CODE_FINDER__`)
   ```typescript
   window.__REACT_CODE_FINDER__.enable()
   window.__REACT_CODE_FINDER__.disable()
@@ -48,7 +47,7 @@
 
 ### 8. 개발자 도구 통합
 - [x] `debug: true` 옵션으로 상세 로깅
-- [ ] 브라우저 콘솔에서 상태 확인 API
+- [x] 브라우저 콘솔에서 상태 확인 API (`window.__REACT_CODE_FINDER__`)
 
 ### 9. 번들 최적화
 - [ ] 클라이언트 번들 인라인 대신 별도 청크로 분리 검토
@@ -68,4 +67,3 @@
 | `toastPosition` | `string` | `'bottom-right'` | 토스트 위치 |
 | `debug` | `boolean` | `false` | 디버그 로깅 활성화 (구현 완료 ✅) |
 | `showNoSource` | `boolean` | `false` | 소스 없는 컴포넌트 오버레이 표시 (구현 완료 ✅) |
-| `onError` | `(error: Error) => void` | `undefined` | 에러 콜백 |

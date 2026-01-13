@@ -1,4 +1,4 @@
-import type { Fiber, ReactCodeFinderOptions } from '../core/types'
+import type { Fiber, ReactCodeFinderOptions, ReactCodeFinderAPI } from '../core/types'
 import {
   hookIntoReactDevTools,
   traverseFiberTree,
@@ -74,15 +74,59 @@ export class Inspector {
       logger.error('Failed to hook into React DevTools:', error)
       this.toast.show('Initialization error', 'info')
     }
+
+    this.registerGlobalAPI()
   }
 
   destroy(): void {
-    this.disableInspector()
+    this.disable()
     this.unhookFn?.()
     this.unhookFn = null
     this.toggleButton.destroy()
     this.overlay.destroy()
     this.toast.destroy()
+    delete window.__REACT_CODE_FINDER__
+  }
+
+  enable(): void {
+    this.enableInspector()
+    this.toggleButton.setActive(true)
+  }
+
+  disable(): void {
+    this.disableInspector()
+    this.toggleButton.setActive(false)
+  }
+
+  toggle(): void {
+    if (this.enabled) {
+      this.disable()
+    } else {
+      this.enable()
+    }
+  }
+
+  get isEnabled(): boolean {
+    return this.enabled
+  }
+
+  private registerGlobalAPI(): void {
+    const api: ReactCodeFinderAPI = {
+      enable: () => this.enable(),
+      disable: () => this.disable(),
+      toggle: () => this.toggle(),
+      get isEnabled() {
+        return this.isEnabled
+      },
+    }
+
+    Object.defineProperty(api, 'isEnabled', {
+      get: () => this.enabled,
+      enumerable: true,
+    })
+
+    window.__REACT_CODE_FINDER__ = api
+    logger.debug('Global API registered: window.__REACT_CODE_FINDER__')
   }
 
   private enableInspector(): void {

@@ -119,6 +119,24 @@ This will log:
 - Component source extraction
 - DevTools hook initialization status
 
+## Programmatic API
+
+Control the inspector from browser console or your code:
+
+```typescript
+// Enable inspector
+window.__REACT_CODE_FINDER__.enable()
+
+// Disable inspector
+window.__REACT_CODE_FINDER__.disable()
+
+// Toggle inspector
+window.__REACT_CODE_FINDER__.toggle()
+
+// Check if inspector is enabled
+window.__REACT_CODE_FINDER__.isEnabled // boolean
+```
+
 ## How It Works
 
 1. A toggle button appears at the bottom-right corner when the dev server starts.

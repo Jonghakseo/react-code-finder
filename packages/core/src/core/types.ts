@@ -103,9 +103,16 @@ export interface ReactCodeFinderOptions {
   showNoSource?: boolean
 }
 
+export interface ReactCodeFinderAPI {
+  enable(): void
+  disable(): void
+  toggle(): void
+  readonly isEnabled: boolean
+}
+
 declare global {
   interface Window {
     __REACT_DEVTOOLS_GLOBAL_HOOK__?: ReactDevToolsHook
-    __REACT_CODE_FINDER__?: unknown
+    __REACT_CODE_FINDER__?: ReactCodeFinderAPI
   }
 }

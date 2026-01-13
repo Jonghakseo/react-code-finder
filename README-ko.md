@@ -118,6 +118,24 @@ reactCodeFinder({
 - 컴포넌트 소스 추출 과정
 - DevTools 훅 초기화 상태
 
+## Programmatic API
+
+브라우저 콘솔이나 코드에서 Inspector를 제어할 수 있습니다:
+
+```typescript
+// Inspector 활성화
+window.__REACT_CODE_FINDER__.enable()
+
+// Inspector 비활성화
+window.__REACT_CODE_FINDER__.disable()
+
+// Inspector 토글
+window.__REACT_CODE_FINDER__.toggle()
+
+// Inspector 활성화 상태 확인
+window.__REACT_CODE_FINDER__.isEnabled // boolean
+```
+
 ## How It Works
 
 1. 개발 서버 실행 시 화면 우측 하단에 토글 버튼이 표시됩니다.
