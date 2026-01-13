@@ -220,13 +220,13 @@ importers:
       '@react-code-finder/core':
         specifier: workspace:*
         version: link:../core
-      next:
-        specifier: '>=12.0.0'
-        version: 15.5.9(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
     devDependencies:
       '@types/node':
         specifier: ^24.0.0
         version: 24.10.7
+      next:
+        specifier: '>=14.0.0'
+        version: 15.5.9(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
 
   packages/vite:
     dependencies:

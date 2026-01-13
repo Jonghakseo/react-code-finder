@@ -1,41 +1,13 @@
 import { join } from 'node:path'
+import type { NextConfig } from 'next'
+
+type WebpackFn = NonNullable<NextConfig['webpack']>
+type WebpackConfig = Parameters<WebpackFn>[0]
+type WebpackContext = Parameters<WebpackFn>[1]
 
 export interface ReactCodeFinderOptions {
   enabled?: boolean
   buttonPosition?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
-}
-
-interface NextConfig {
-  webpack?: (config: WebpackConfig, context: WebpackContext) => WebpackConfig
-  [key: string]: unknown
-}
-
-interface WebpackConfig {
-  entry: WebpackEntry | (() => Promise<WebpackEntry>)
-  module?: {
-    rules?: WebpackRule[]
-  }
-  resolve?: {
-    alias?: Record<string, string>
-  }
-  [key: string]: unknown
-}
-
-interface WebpackEntry {
-  [key: string]: string[]
-}
-
-interface WebpackContext {
-  dev: boolean
-  isServer: boolean
-  [key: string]: unknown
-}
-
-interface WebpackRule {
-  test?: RegExp
-  enforce?: 'pre' | 'post'
-  use?: Array<{ loader: string }>
-  [key: string]: unknown
 }
 
 function getLoaderPath(): string {
