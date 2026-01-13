@@ -76,6 +76,10 @@ interface ReactCodeFinderOptions {
   maxDepth?: number
   // Anonymous/Unknown 컴포넌트를 스택에서 제외 (default: true)
   skipAnonymous?: boolean
+  // 디버그 로그 활성화 (default: false)
+  debug?: boolean
+  // 소스 정보가 없는 컴포넌트도 오버레이 표시 (default: false)
+  showNoSource?: boolean
 }
 ```
 
@@ -86,16 +90,33 @@ interface ReactCodeFinderOptions {
 reactCodeFinder({
   enabled: true,
   buttonPosition: 'bottom-left',
+  debug: true, // 디버그 로깅 활성화
 })
 
 // Next.js
 withReactCodeFinder({
   enabled: true,
   buttonPosition: 'bottom-left',
+  showNoSource: true, // 소스 없는 컴포넌트도 표시
 })({
   // next.js config
 })
 ```
+
+### 문제 해결
+
+`debug: true` 옵션을 활성화하면 브라우저 콘솔에서 상세 로그를 확인할 수 있습니다:
+
+```typescript
+reactCodeFinder({
+  debug: true,
+})
+```
+
+로그 내용:
+- Fiber 트리 탐색 상세 정보
+- 컴포넌트 소스 추출 과정
+- DevTools 훅 초기화 상태
 
 ## How It Works
 

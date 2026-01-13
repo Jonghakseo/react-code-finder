@@ -1,4 +1,5 @@
 import type { Fiber, FiberRoot, ReactDevToolsHook } from './types'
+import { logger } from './errors'
 
 type FiberRootCallback = (fiberRoot: FiberRoot) => void
 
@@ -6,16 +7,22 @@ export function hookIntoReactDevTools(onCommit: FiberRootCallback): () => void {
   const hook = window.__REACT_DEVTOOLS_GLOBAL_HOOK__
 
   if (!hook) {
+    logger.debug('No existing DevTools hook found, creating custom hook')
     const customHook: ReactDevToolsHook = {
       renderers: new Map(),
       supportsFiber: true,
       inject(renderer: unknown) {
         const id = Math.random()
         this.renderers.set(id, renderer)
+        logger.debug('Renderer injected with id:', id)
         return id
       },
       onCommitFiberRoot(_rendererID: number, root: FiberRoot) {
-        onCommit(root)
+        try {
+          onCommit(root)
+        } catch (error) {
+          logger.error('Error in onCommitFiberRoot callback:', error)
+        }
       },
       onCommitFiberUnmount() {},
     }
@@ -26,12 +33,17 @@ export function hookIntoReactDevTools(onCommit: FiberRootCallback): () => void {
     }
   }
 
+  logger.debug('Existing DevTools hook found, wrapping onCommitFiberRoot')
   const originalOnCommitFiberRoot = hook.onCommitFiberRoot?.bind(hook)
 
   hook.onCommitFiberRoot = new Proxy(hook.onCommitFiberRoot, {
     apply(target, thisArg, argumentsList: [number, FiberRoot, number?]) {
       const [, root] = argumentsList
-      onCommit(root)
+      try {
+        onCommit(root)
+      } catch (error) {
+        logger.error('Error in onCommitFiberRoot callback:', error)
+      }
       return Reflect.apply(target, thisArg, argumentsList)
     },
   })

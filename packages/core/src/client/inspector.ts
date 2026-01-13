@@ -12,6 +12,8 @@ import {
   getComponentStack,
   formatComponentStack,
 } from '../core/source'
+import { validateOptions } from '../core/validate'
+import { logger } from '../core/errors'
 import { Overlay } from './overlay'
 import { Toast } from './toast'
 import { ToggleButton } from './toggle-button'
@@ -28,12 +30,19 @@ export class Inspector {
   private currentTarget: HTMLElement | null = null
 
   constructor(options: ReactCodeFinderOptions = {}) {
+    validateOptions(options)
+
     this.options = {
       enabled: options.enabled ?? process.env.NODE_ENV === 'development',
       buttonPosition: options.buttonPosition ?? 'bottom-right',
       maxDepth: options.maxDepth ?? 5,
       skipAnonymous: options.skipAnonymous ?? true,
+      debug: options.debug ?? false,
+      showNoSource: options.showNoSource ?? false,
     }
+
+    logger.setDebugMode(this.options.debug)
+    logger.debug('Inspector initialized with options:', this.options)
 
     this.overlay = new Overlay()
     this.toast = new Toast()
@@ -47,13 +56,24 @@ export class Inspector {
   }
 
   init(): void {
-    if (!this.options.enabled) return
+    if (!this.options.enabled) {
+      logger.debug('Inspector disabled, skipping initialization')
+      return
+    }
 
+    logger.debug('Initializing inspector...')
     this.toggleButton.create(this.options.buttonPosition)
 
-    this.unhookFn = hookIntoReactDevTools((fiberRoot) => {
-      this.traverseFiberTree(fiberRoot.current)
-    })
+    try {
+      this.unhookFn = hookIntoReactDevTools((fiberRoot) => {
+        logger.debug('Fiber root committed, traversing tree')
+        this.traverseFiberTree(fiberRoot.current)
+      })
+      logger.debug('Successfully hooked into React DevTools')
+    } catch (error) {
+      logger.error('Failed to hook into React DevTools:', error)
+      this.toast.show('Initialization error', 'info')
+    }
   }
 
   destroy(): void {
@@ -125,7 +145,6 @@ export class Inspector {
     const target = e.target as HTMLElement
     if (this.isInternalElement(target)) return
 
-    // Skip if same target
     if (target === this.currentTarget) return
 
     const fiber = this.findComponentFiber(target)
@@ -135,10 +154,23 @@ export class Inspector {
       const source = getSourceFromFiber(fiber)
       const name = getComponentName(fiber)
 
-      this.overlay.show(target, {
-        componentName: name,
-        source: source ? formatSourceLocation(source) : '',
-      })
+      logger.debug('Hovered component:', name, source)
+
+      if (source) {
+        this.overlay.show(target, {
+          componentName: name,
+          source: formatSourceLocation(source),
+        })
+      } else if (this.options.showNoSource) {
+        this.overlay.show(target, {
+          componentName: name,
+          source: 'No source available',
+        })
+      } else {
+        logger.debug('No source info for component:', name)
+        this.currentTarget = null
+        this.overlay.hide()
+      }
     } else {
       this.currentTarget = null
       this.overlay.hide()
@@ -175,18 +207,27 @@ export class Inspector {
     const fiber = this.findComponentFiber(target)
 
     if (fiber) {
-      const stack = getComponentStack(fiber, this.options.maxDepth, this.options.skipAnonymous)
-      if (stack.length > 0) {
-        const stackText = formatComponentStack(stack)
-        copyToClipboard(stackText).then((success) => {
-          if (success) {
-            this.toast.show('Copied!', 'success')
-          } else {
-            this.toast.show('Failed to copy', 'info')
-          }
-        })
-      } else {
-        this.toast.show('No source info', 'info')
+      try {
+        const stack = getComponentStack(fiber, this.options.maxDepth, this.options.skipAnonymous)
+        logger.debug('Component stack:', stack)
+
+        if (stack.length > 0) {
+          const stackText = formatComponentStack(stack)
+          copyToClipboard(stackText).then((success) => {
+            if (success) {
+              this.toast.show('Copied!', 'success')
+            } else {
+              logger.warn('Failed to copy to clipboard')
+              this.toast.show('Failed to copy', 'info')
+            }
+          })
+        } else {
+          logger.debug('No source info found for clicked component')
+          this.toast.show('No source info', 'info')
+        }
+      } catch (error) {
+        logger.error('Error getting component stack:', error)
+        this.toast.show('Error occurred', 'info')
       }
     }
   }

@@ -3,9 +3,9 @@
 ## 🔴 높은 우선순위
 
 ### 1. 에러 핸들링 및 피드백 개선
-- [ ] DevTools 훅 인터셉션 실패 시 사용자 피드백 추가
-- [ ] 소스 위치를 찾지 못한 컴포넌트에 대한 안내 메시지
-- [ ] 설정 옵션 유효성 검사 (잘못된 `buttonPosition` 등)
+- [x] DevTools 훅 인터셉션 실패 시 사용자 피드백 추가
+- [x] 소스 위치를 찾지 못한 컴포넌트에 대한 안내 메시지 (`showNoSource` 옵션)
+- [x] 설정 옵션 유효성 검사 (잘못된 `buttonPosition` 등)
 - [ ] `onError` 콜백 옵션 추가
 
 ### 2. 프로그래매틱 API
@@ -47,7 +47,7 @@
 - [ ] 마이그레이션 가이드
 
 ### 8. 개발자 도구 통합
-- [ ] `debug: true` 옵션으로 상세 로깅
+- [x] `debug: true` 옵션으로 상세 로깅
 - [ ] 브라우저 콘솔에서 상태 확인 API
 
 ### 9. 번들 최적화
@@ -66,5 +66,6 @@
 | `overlayColor` | `string` | `'rgba(0, 136, 255, 0.1)'` | 오버레이 배경색 |
 | `toastDuration` | `number` | `2000` | 토스트 표시 시간(ms) |
 | `toastPosition` | `string` | `'bottom-right'` | 토스트 위치 |
-| `debug` | `boolean` | `false` | 디버그 로깅 활성화 |
+| `debug` | `boolean` | `false` | 디버그 로깅 활성화 (구현 완료 ✅) |
+| `showNoSource` | `boolean` | `false` | 소스 없는 컴포넌트 오버레이 표시 (구현 완료 ✅) |
 | `onError` | `(error: Error) => void` | `undefined` | 에러 콜백 |

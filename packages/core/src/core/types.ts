@@ -84,6 +84,23 @@ export interface ReactCodeFinderOptions {
    * @default true
    */
   skipAnonymous?: boolean
+
+  /**
+   * Enable debug mode to output detailed logs to the console.
+   * Useful for troubleshooting when the inspector is not working as expected.
+   * Logs include fiber traversal, source extraction, and hook initialization details.
+   * @default false
+   */
+  debug?: boolean
+
+  /**
+   * Show overlay for components that don't have source location information.
+   * When true, hovering over components without source info will still show an overlay
+   * with the component name and "No source available" message.
+   * When false (default), the overlay is hidden for components without source info.
+   * @default false
+   */
+  showNoSource?: boolean
 }
 
 declare global {

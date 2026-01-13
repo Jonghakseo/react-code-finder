@@ -77,6 +77,10 @@ interface ReactCodeFinderOptions {
   maxDepth?: number
   // Skip anonymous/unknown components in stack trace (default: true)
   skipAnonymous?: boolean
+  // Enable debug logging to console (default: false)
+  debug?: boolean
+  // Show overlay for components without source info (default: false)
+  showNoSource?: boolean
 }
 ```
 
@@ -87,16 +91,33 @@ interface ReactCodeFinderOptions {
 reactCodeFinder({
   enabled: true,
   buttonPosition: 'bottom-left',
+  debug: true, // Enable debug logging
 })
 
 // Next.js
 withReactCodeFinder({
   enabled: true,
   buttonPosition: 'bottom-left',
+  showNoSource: true, // Show components without source info
 })({
   // next.js config
 })
 ```
+
+### Troubleshooting
+
+Enable `debug: true` to see detailed logs in the browser console:
+
+```typescript
+reactCodeFinder({
+  debug: true,
+})
+```
+
+This will log:
+- Fiber tree traversal details
+- Component source extraction
+- DevTools hook initialization status
 
 ## How It Works
 
