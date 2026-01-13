@@ -26,7 +26,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage"
   },
   "keywords": [
     "react",
@@ -47,6 +49,9 @@
     "url": "https://github.com/Jonghakseo/react-code-finder/issues"
   },
   "devDependencies": {
-    "@types/node": "^24.0.0"
+    "@types/node": "^24.0.0",
+    "@vitest/coverage-v8": "^4.0.17",
+    "jsdom": "^27.4.0",
+    "vitest": "^4.0.17"
   }
 }
