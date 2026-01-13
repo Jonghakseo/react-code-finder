@@ -45,5 +45,8 @@
   "homepage": "https://github.com/Jonghakseo/react-code-finder#readme",
   "bugs": {
     "url": "https://github.com/Jonghakseo/react-code-finder/issues"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0"
   }
 }

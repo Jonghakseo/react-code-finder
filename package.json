@@ -2,6 +2,11 @@
   "name": "react-code-finder-monorepo",
   "version": "0.0.1",
   "private": true,
+  "pnpm": {
+    "overrides": {
+      "@types/node": "^24.0.0"
+    }
+  },
   "scripts": {
     "build": "pnpm --filter './packages/*' build",
     "dev": "pnpm -r --parallel dev",
