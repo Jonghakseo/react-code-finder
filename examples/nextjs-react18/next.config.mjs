@@ -1,4 +1,5 @@
-const { withReactCodeFinder } = require('@react-code-finder/nextjs')
+// @ts-check
+import { withReactCodeFinder } from '@react-code-finder/nextjs'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -11,4 +12,4 @@ const nextConfig = {
   },
 }
 
-module.exports = withReactCodeFinder()(nextConfig)
+export default withReactCodeFinder()(nextConfig)
