@@ -39,6 +39,7 @@ export function reactCodeFinder(options: ReactCodeFinderOptions = {}): Plugin {
     },
 
     transform(code, id) {
+      if (!enabled) return
       if (!isServe) return
       if (!id.includes('jsx-dev-runtime')) return
 
