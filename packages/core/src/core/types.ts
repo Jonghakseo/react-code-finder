@@ -109,6 +109,14 @@ export interface ReactCodeFinderOptions {
    * @default true
    */
   disableOnEscape?: boolean
+
+  /**
+   * Output format for clipboard copy.
+   * 'xml' provides structured format optimized for LLM context.
+   * 'plain' uses the legacy plain text format.
+   * @default 'xml'
+   */
+  outputFormat?: 'xml' | 'plain'
 }
 
 export interface ReactCodeFinderAPI {

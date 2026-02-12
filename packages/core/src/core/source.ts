@@ -1,4 +1,5 @@
 import type { Fiber, SourceLocation } from './types'
+import { serializeProps, formatProps, type SerializedProps } from './props'
 
 interface DebugOwner {
   name?: string
@@ -210,6 +211,7 @@ export function getShortFileName(fileName: string): string {
 export interface ComponentStackItem {
   name: string
   source: SourceLocation | null
+  props: SerializedProps | null
 }
 
 export function getComponentStack(fiber: Fiber, maxDepth: number, skipAnonymous: boolean): ComponentStackItem[] {
@@ -243,7 +245,7 @@ export function getComponentStack(fiber: Fiber, maxDepth: number, skipAnonymous:
           if (!source && fiberDebugStack && name) {
             source = parseSourceFromDebugStack(fiberDebugStack, name)
           }
-          stack.push({ name, source })
+          stack.push({ name, source, props: null })
         }
         currentOwner = currentOwner.owner ?? null
       }
@@ -257,7 +259,7 @@ export function getComponentStack(fiber: Fiber, maxDepth: number, skipAnonymous:
       const shouldSkip = skipAnonymous && (name === 'Unknown' || name === 'Anonymous')
       if (!shouldSkip && !seenNames.has(name)) {
         seenNames.add(name)
-        stack.push({ name, source })
+        stack.push({ name, source, props: serializeProps(current.pendingProps) })
       }
     }
 
@@ -337,10 +339,11 @@ export function formatComponentStack(stack: ComponentStackItem[]): string {
   return stack
     .map((item, index) => {
       const prefix = index === 0 ? '' : '  '.repeat(index) + '← '
+      const propsStr = item.props ? ` ${formatProps(item.props)}` : ''
       if (item.source) {
-        return `${prefix}${item.name} (${formatSourceLocation(item.source)})`
+        return `${prefix}${item.name}${propsStr} (${formatSourceLocation(item.source)})`
       }
-      return `${prefix}${item.name}`
+      return `${prefix}${item.name}${propsStr}`
     })
     .join('\n')
 }
