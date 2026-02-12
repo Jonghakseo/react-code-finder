@@ -12,7 +12,7 @@ import {
   getComponentStack,
 } from '../core/source'
 import { formatOutput, formatComponentTree } from '../core/formatter'
-import { findComponentsInArea, type ComponentTreeNode, type SelectionRect } from '../core/area-selection'
+import { findComponentsInArea, type SelectionRect } from '../core/area-selection'
 import { SelectionOverlay } from './selection-overlay'
 import { validateOptions } from '../core/validate'
 import { logger } from '../core/errors'
@@ -438,26 +438,7 @@ export class Inspector {
       return
     }
 
-    const sources = new Map<string, SourceSnippet>()
-    const fileNames = new Set<string>()
-
-    const collectFiles = (nodes: ComponentTreeNode[]) => {
-      for (const node of nodes) {
-        if (node.source && !fileNames.has(node.source.fileName)) {
-          fileNames.add(node.source.fileName)
-        }
-        collectFiles(node.children)
-      }
-    }
-    collectFiles(tree)
-
-    const fetchPromises = Array.from(fileNames).map(async (fileName) => {
-      const snippet = await fetchSourceCode(fileName, 0, 50)
-      if (snippet) sources.set(fileName, snippet)
-    })
-    await Promise.all(fetchPromises)
-
-    const output = formatComponentTree(tree, sources, this.options.outputFormat)
+    const output = formatComponentTree(tree, new Map(), this.options.outputFormat)
     const success = await copyToClipboard(output)
     if (success) {
       this.toast.show(`Copied ${tree.length} component(s)!`, 'success')
