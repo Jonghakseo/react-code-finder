@@ -1,6 +1,6 @@
 {
   "name": "@react-code-finder/vite",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "description": "Vite plugin for react-code-finder - Inspect React components and copy source locations",
   "type": "module",
   "main": "./dist/index.js",
