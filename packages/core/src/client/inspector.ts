@@ -35,6 +35,8 @@ export class Inspector {
   private currentTarget: HTMLElement | null = null
   private dragStart: { x: number; y: number } | null = null
   private isDragging = false
+  private shiftHeld = false
+  private shiftActivated = false
 
   constructor(options: ReactCodeFinderOptions = {}) {
     validateOptions(options)
@@ -148,6 +150,7 @@ export class Inspector {
     document.addEventListener('mouseout', this.handleMouseOut, true)
     document.addEventListener('click', this.handleClick, true)
     document.addEventListener('keydown', this.handleKeyDown, true)
+    document.addEventListener('keyup', this.handleKeyUp, true)
     document.body.style.cursor = 'crosshair'
 
     this.toast.show('Inspector enabled', 'info')
@@ -161,6 +164,7 @@ export class Inspector {
     document.removeEventListener('mouseout', this.handleMouseOut, true)
     document.removeEventListener('click', this.handleClick, true)
     document.removeEventListener('keydown', this.handleKeyDown, true)
+    document.removeEventListener('keyup', this.handleKeyUp, true)
     document.removeEventListener('mousedown', this.handleMouseDown, true)
     document.removeEventListener('mousemove', this.handleMouseMoveSelection, true)
     document.removeEventListener('mouseup', this.handleMouseUp, true)
@@ -170,6 +174,8 @@ export class Inspector {
     this.currentTarget = null
     this.dragStart = null
     this.isDragging = false
+    this.shiftHeld = false
+    this.shiftActivated = false
     this.overlay.hide()
     this.selectionOverlay.hide()
   }
@@ -314,36 +320,56 @@ export class Inspector {
     if (e.key === 'Escape' && this.options.disableOnEscape) {
       this.disable()
     }
-    if ((e.key === 's' || e.key === 'S') && this.enabled) {
-      this.toggleSelectionMode()
+    if ((e.key === 's' || e.key === 'S') && this.enabled && !this.shiftHeld) {
+      if (this.mode === 'inspect') {
+        this.shiftActivated = false
+        this.enterSelectionMode()
+        this.toast.show('Area selection mode (drag to select)', 'info')
+      } else {
+        this.exitSelectionMode()
+        this.toast.show('Inspector mode', 'info')
+      }
+    }
+    if (e.key === 'Shift' && this.enabled && this.mode === 'inspect') {
+      this.shiftHeld = true
+      this.shiftActivated = true
+      this.enterSelectionMode()
     }
   }
 
-  private toggleSelectionMode(): void {
-    if (this.mode === 'inspect') {
-      this.mode = 'select'
-      document.body.style.cursor = 'crosshair'
-      this.toggleButton.setSelectMode(true)
-      this.toast.show('Area selection mode (drag to select)', 'info')
-      document.addEventListener('mousedown', this.handleMouseDown, true)
-      document.addEventListener('mousemove', this.handleMouseMoveSelection, true)
-      document.addEventListener('mouseup', this.handleMouseUp, true)
-      document.removeEventListener('mouseover', this.handleMouseOver, true)
-      document.removeEventListener('mouseout', this.handleMouseOut, true)
-      document.removeEventListener('click', this.handleClick, true)
-      this.overlay.hide()
-    } else {
-      this.mode = 'inspect'
-      this.toggleButton.setSelectMode(false)
-      this.toast.show('Inspector mode', 'info')
-      document.removeEventListener('mousedown', this.handleMouseDown, true)
-      document.removeEventListener('mousemove', this.handleMouseMoveSelection, true)
-      document.removeEventListener('mouseup', this.handleMouseUp, true)
-      document.addEventListener('mouseover', this.handleMouseOver, true)
-      document.addEventListener('mouseout', this.handleMouseOut, true)
-      document.addEventListener('click', this.handleClick, true)
-      this.selectionOverlay.hide()
+  private handleKeyUp = (e: KeyboardEvent): void => {
+    if (e.key === 'Shift' && this.shiftHeld) {
+      this.shiftHeld = false
+      if (this.shiftActivated && this.mode === 'select' && !this.isDragging) {
+        this.shiftActivated = false
+        this.exitSelectionMode()
+      }
     }
+  }
+
+  private enterSelectionMode(): void {
+    this.mode = 'select'
+    document.body.style.cursor = 'crosshair'
+    this.toggleButton.setSelectMode(true)
+    document.addEventListener('mousedown', this.handleMouseDown, true)
+    document.addEventListener('mousemove', this.handleMouseMoveSelection, true)
+    document.addEventListener('mouseup', this.handleMouseUp, true)
+    document.removeEventListener('mouseover', this.handleMouseOver, true)
+    document.removeEventListener('mouseout', this.handleMouseOut, true)
+    document.removeEventListener('click', this.handleClick, true)
+    this.overlay.hide()
+  }
+
+  private exitSelectionMode(): void {
+    this.mode = 'inspect'
+    this.toggleButton.setSelectMode(false)
+    document.removeEventListener('mousedown', this.handleMouseDown, true)
+    document.removeEventListener('mousemove', this.handleMouseMoveSelection, true)
+    document.removeEventListener('mouseup', this.handleMouseUp, true)
+    document.addEventListener('mouseover', this.handleMouseOver, true)
+    document.addEventListener('mouseout', this.handleMouseOut, true)
+    document.addEventListener('click', this.handleClick, true)
+    this.selectionOverlay.hide()
   }
 
   private handleMouseDown = (e: MouseEvent): void => {
@@ -393,6 +419,11 @@ export class Inspector {
     this.selectionOverlay.hide()
 
     this.handleAreaSelection(selectionRect)
+
+    if (this.shiftActivated && !this.shiftHeld) {
+      this.shiftActivated = false
+      this.exitSelectionMode()
+    }
   }
 
   private async handleAreaSelection(selectionRect: SelectionRect): Promise<void> {
