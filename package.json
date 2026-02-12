@@ -9,6 +9,10 @@
   },
   "scripts": {
     "build": "pnpm --filter './packages/*' build",
+    "test:e2e": "E2E_GROUP=vite playwright test && E2E_GROUP=nextjs playwright test && E2E_GROUP=nextjs-app playwright test",
+    "test:e2e:vite": "E2E_GROUP=vite playwright test",
+    "test:e2e:nextjs": "E2E_GROUP=nextjs playwright test",
+    "test:e2e:nextjs-app": "E2E_GROUP=nextjs-app playwright test",
     "dev": "pnpm -r --parallel dev",
     "version:patch": "pnpm --filter './packages/*' exec npm version patch",
     "version:minor": "pnpm --filter './packages/*' exec npm version minor",
@@ -21,6 +25,7 @@
     "release:major": "pnpm version:major && pnpm version:commit && pnpm publish:all && pnpm tag"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   }
