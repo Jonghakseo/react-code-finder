@@ -26,6 +26,13 @@ function escapeXml(str: string): string {
     .replace(/"/g, '&quot;')
 }
 
+function escapeXmlContent(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
 function formatXmlOutput(
   stack: ComponentStackItem[],
   sources: Map<string, SourceSnippet>
@@ -45,7 +52,7 @@ function formatXmlOutput(
   lines.push(`<component ${primaryAttrs.join(' ')}>`)
 
   if (primary.props) {
-    lines.push(`  <props>${escapeXml(formatProps(primary.props))}</props>`)
+    lines.push(`  <props>${escapeXmlContent(formatProps(primary.props))}</props>`)
   }
 
   const primarySource = primary.source ? sources.get(primary.source.fileName) : null
@@ -134,7 +141,7 @@ function formatTreeXml(
       const lines: string[] = [`${pad}<component ${attrs.join(' ')}>`]
 
       if (node.props) {
-        lines.push(`${pad}  <props>${escapeXml(formatProps(node.props))}</props>`)
+        lines.push(`${pad}  <props>${escapeXmlContent(formatProps(node.props))}</props>`)
       }
 
       const sourceSnippet = node.source ? sources.get(node.source.fileName) : null

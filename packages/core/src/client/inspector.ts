@@ -323,6 +323,7 @@ export class Inspector {
     if (this.mode === 'inspect') {
       this.mode = 'select'
       document.body.style.cursor = 'crosshair'
+      this.toggleButton.setSelectMode(true)
       this.toast.show('Area selection mode (drag to select)', 'info')
       document.addEventListener('mousedown', this.handleMouseDown, true)
       document.addEventListener('mousemove', this.handleMouseMoveSelection, true)
@@ -333,6 +334,7 @@ export class Inspector {
       this.overlay.hide()
     } else {
       this.mode = 'inspect'
+      this.toggleButton.setSelectMode(false)
       this.toast.show('Inspector mode', 'info')
       document.removeEventListener('mousedown', this.handleMouseDown, true)
       document.removeEventListener('mousemove', this.handleMouseMoveSelection, true)

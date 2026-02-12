@@ -41,7 +41,7 @@ describe('formatOutput - XML', () => {
     const result = formatOutput(stack, new Map(), 'xml')
 
     expect(result).toContain('<props>')
-    expect(result).toContain('variant={&quot;primary&quot;}')
+    expect(result).toContain('variant={"primary"}')
     expect(result).toContain('</props>')
   })
 
