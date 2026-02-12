@@ -35,4 +35,11 @@ export function validateOptions(options: ReactCodeFinderOptions): void {
   if (options.showNoSource !== undefined && typeof options.showNoSource !== 'boolean') {
     throw new InvalidOptionError('showNoSource', options.showNoSource, 'boolean')
   }
+
+  if (options.outputFormat !== undefined) {
+    const validFormats = ['xml', 'plain'] as const
+    if (!validFormats.includes(options.outputFormat as typeof validFormats[number])) {
+      throw new InvalidOptionError('outputFormat', options.outputFormat, '"xml" or "plain"')
+    }
+  }
 }

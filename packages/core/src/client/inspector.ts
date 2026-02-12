@@ -10,24 +10,33 @@ import {
   findUserComponentFiber,
   formatSourceLocation,
   getComponentStack,
-  formatComponentStack,
 } from '../core/source'
+import { formatOutput, formatComponentTree } from '../core/formatter'
+import { findComponentsInArea, type SelectionRect } from '../core/area-selection'
+import { SelectionOverlay } from './selection-overlay'
 import { validateOptions } from '../core/validate'
 import { logger } from '../core/errors'
 import { Overlay } from './overlay'
 import { Toast } from './toast'
 import { ToggleButton } from './toggle-button'
 import { copyToClipboard } from './clipboard'
+import { fetchSourceCode, type SourceSnippet } from './source-fetcher'
 
 export class Inspector {
   private enabled = false
+  private mode: 'inspect' | 'select' = 'inspect'
   private overlay: Overlay
+  private selectionOverlay: SelectionOverlay
   private toast: Toast
   private toggleButton: ToggleButton
   private elementToFiberMap = new WeakMap<HTMLElement, Fiber>()
   private unhookFn: (() => void) | null = null
   private options: Required<ReactCodeFinderOptions>
   private currentTarget: HTMLElement | null = null
+  private dragStart: { x: number; y: number } | null = null
+  private isDragging = false
+  private shiftHeld = false
+  private shiftActivated = false
 
   constructor(options: ReactCodeFinderOptions = {}) {
     validateOptions(options)
@@ -40,12 +49,14 @@ export class Inspector {
       debug: options.debug ?? false,
       showNoSource: options.showNoSource ?? false,
       disableOnEscape: options.disableOnEscape ?? true,
+      outputFormat: options.outputFormat ?? 'xml',
     }
 
     logger.setDebugMode(this.options.debug)
     logger.debug('Inspector initialized with options:', this.options)
 
     this.overlay = new Overlay()
+    this.selectionOverlay = new SelectionOverlay()
     this.toast = new Toast()
     this.toggleButton = new ToggleButton((active) => {
       if (active) {
@@ -85,6 +96,7 @@ export class Inspector {
     this.unhookFn = null
     this.toggleButton.destroy()
     this.overlay.destroy()
+    this.selectionOverlay.destroy()
     this.toast.destroy()
     delete window.__REACT_CODE_FINDER__
   }
@@ -138,6 +150,7 @@ export class Inspector {
     document.addEventListener('mouseout', this.handleMouseOut, true)
     document.addEventListener('click', this.handleClick, true)
     document.addEventListener('keydown', this.handleKeyDown, true)
+    document.addEventListener('keyup', this.handleKeyUp, true)
     document.body.style.cursor = 'crosshair'
 
     this.toast.show('Inspector enabled', 'info')
@@ -151,10 +164,20 @@ export class Inspector {
     document.removeEventListener('mouseout', this.handleMouseOut, true)
     document.removeEventListener('click', this.handleClick, true)
     document.removeEventListener('keydown', this.handleKeyDown, true)
+    document.removeEventListener('keyup', this.handleKeyUp, true)
+    document.removeEventListener('mousedown', this.handleMouseDown, true)
+    document.removeEventListener('mousemove', this.handleMouseMoveSelection, true)
+    document.removeEventListener('mouseup', this.handleMouseUp, true)
     document.body.style.cursor = ''
 
+    this.mode = 'inspect'
     this.currentTarget = null
+    this.dragStart = null
+    this.isDragging = false
+    this.shiftHeld = false
+    this.shiftActivated = false
     this.overlay.hide()
+    this.selectionOverlay.hide()
   }
 
   private traverseFiberTree(fiber: Fiber): void {
@@ -259,15 +282,7 @@ export class Inspector {
         logger.debug('Component stack:', stack)
 
         if (stack.length > 0) {
-          const stackText = formatComponentStack(stack)
-          copyToClipboard(stackText).then((success) => {
-            if (success) {
-              this.toast.show('Copied!', 'success')
-            } else {
-              logger.warn('Failed to copy to clipboard')
-              this.toast.show('Failed to copy', 'info')
-            }
-          })
+          this.fetchSourceAndCopy(stack)
         } else {
           logger.debug('No source info found for clicked component')
           this.toast.show('No source info', 'info')
@@ -279,9 +294,157 @@ export class Inspector {
     }
   }
 
+  private async fetchSourceAndCopy(stack: ReturnType<typeof getComponentStack>): Promise<void> {
+    const sources = new Map<string, SourceSnippet>()
+    const primary = stack[0]
+
+    if (primary?.source) {
+      const snippet = await fetchSourceCode(primary.source.fileName, primary.source.lineNumber)
+      if (snippet) {
+        sources.set(primary.source.fileName, snippet)
+      }
+    }
+
+    const output = formatOutput(stack, sources, this.options.outputFormat)
+
+    const success = await copyToClipboard(output)
+    if (success) {
+      this.toast.show('Copied!', 'success')
+    } else {
+      logger.warn('Failed to copy to clipboard')
+      this.toast.show('Failed to copy', 'info')
+    }
+  }
+
   private handleKeyDown = (e: KeyboardEvent): void => {
     if (e.key === 'Escape' && this.options.disableOnEscape) {
       this.disable()
+    }
+    if ((e.key === 's' || e.key === 'S') && this.enabled && !this.shiftHeld) {
+      if (this.mode === 'inspect') {
+        this.shiftActivated = false
+        this.enterSelectionMode()
+        this.toast.show('Area selection mode (drag to select)', 'info')
+      } else {
+        this.exitSelectionMode()
+        this.toast.show('Inspector mode', 'info')
+      }
+    }
+    if (e.key === 'Shift' && this.enabled && this.mode === 'inspect') {
+      this.shiftHeld = true
+      this.shiftActivated = true
+      this.enterSelectionMode()
+    }
+  }
+
+  private handleKeyUp = (e: KeyboardEvent): void => {
+    if (e.key === 'Shift' && this.shiftHeld) {
+      this.shiftHeld = false
+      if (this.shiftActivated && this.mode === 'select' && !this.isDragging) {
+        this.shiftActivated = false
+        this.exitSelectionMode()
+      }
+    }
+  }
+
+  private enterSelectionMode(): void {
+    this.mode = 'select'
+    document.body.style.cursor = 'crosshair'
+    this.toggleButton.setSelectMode(true)
+    document.addEventListener('mousedown', this.handleMouseDown, true)
+    document.addEventListener('mousemove', this.handleMouseMoveSelection, true)
+    document.addEventListener('mouseup', this.handleMouseUp, true)
+    document.removeEventListener('mouseover', this.handleMouseOver, true)
+    document.removeEventListener('mouseout', this.handleMouseOut, true)
+    document.removeEventListener('click', this.handleClick, true)
+    this.overlay.hide()
+  }
+
+  private exitSelectionMode(): void {
+    this.mode = 'inspect'
+    this.toggleButton.setSelectMode(false)
+    document.removeEventListener('mousedown', this.handleMouseDown, true)
+    document.removeEventListener('mousemove', this.handleMouseMoveSelection, true)
+    document.removeEventListener('mouseup', this.handleMouseUp, true)
+    document.addEventListener('mouseover', this.handleMouseOver, true)
+    document.addEventListener('mouseout', this.handleMouseOut, true)
+    document.addEventListener('click', this.handleClick, true)
+    this.selectionOverlay.hide()
+  }
+
+  private handleMouseDown = (e: MouseEvent): void => {
+    if (!this.enabled || this.mode !== 'select') return
+    if (this.isInternalElement(e.target as HTMLElement)) return
+
+    e.preventDefault()
+    this.dragStart = { x: e.clientX, y: e.clientY }
+    this.isDragging = false
+  }
+
+  private handleMouseMoveSelection = (e: MouseEvent): void => {
+    if (!this.dragStart) return
+
+    this.isDragging = true
+    const width = e.clientX - this.dragStart.x
+    const height = e.clientY - this.dragStart.y
+    this.selectionOverlay.show(this.dragStart.x, this.dragStart.y, width, height)
+  }
+
+  private handleMouseUp = (e: MouseEvent): void => {
+    if (!this.dragStart || !this.isDragging) {
+      this.dragStart = null
+      return
+    }
+
+    const minSize = 10
+    const width = Math.abs(e.clientX - this.dragStart.x)
+    const height = Math.abs(e.clientY - this.dragStart.y)
+
+    if (width < minSize || height < minSize) {
+      this.dragStart = null
+      this.isDragging = false
+      this.selectionOverlay.hide()
+      return
+    }
+
+    const selectionRect: SelectionRect = {
+      left: Math.min(this.dragStart.x, e.clientX),
+      top: Math.min(this.dragStart.y, e.clientY),
+      right: Math.max(this.dragStart.x, e.clientX),
+      bottom: Math.max(this.dragStart.y, e.clientY),
+    }
+
+    this.dragStart = null
+    this.isDragging = false
+    this.selectionOverlay.hide()
+
+    this.handleAreaSelection(selectionRect)
+
+    if (this.shiftActivated && !this.shiftHeld) {
+      this.shiftActivated = false
+      this.exitSelectionMode()
+    }
+  }
+
+  private async handleAreaSelection(selectionRect: SelectionRect): Promise<void> {
+    const tree = findComponentsInArea(
+      selectionRect,
+      this.elementToFiberMap,
+      this.options.skipAnonymous
+    )
+
+    if (tree.length === 0) {
+      this.toast.show('No components found', 'info')
+      return
+    }
+
+    const output = formatComponentTree(tree, new Map(), this.options.outputFormat)
+    const success = await copyToClipboard(output)
+    if (success) {
+      this.toast.show(`Copied ${tree.length} component(s)!`, 'success')
+    } else {
+      logger.warn('Failed to copy to clipboard')
+      this.toast.show('Failed to copy', 'info')
     }
   }
 
@@ -290,9 +453,11 @@ export class Inspector {
       element.id === 'react-code-finder-toggle-button' ||
       element.id === 'react-code-finder-overlay' ||
       element.id === 'react-code-finder-toast-container' ||
+      element.id === 'react-code-finder-selection-overlay' ||
       element.closest('#react-code-finder-toggle-button') !== null ||
       element.closest('#react-code-finder-overlay') !== null ||
-      element.closest('#react-code-finder-toast-container') !== null
+      element.closest('#react-code-finder-toast-container') !== null ||
+      element.closest('#react-code-finder-selection-overlay') !== null
     )
   }
 }

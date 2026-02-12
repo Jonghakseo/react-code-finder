@@ -96,6 +96,23 @@ describe('ToggleButton', () => {
     })
   })
 
+  describe('setSelectMode', () => {
+    it('can be called before create without error', () => {
+      expect(() => {
+        toggleButton.setSelectMode(true)
+      }).not.toThrow()
+    })
+
+    it('can toggle select mode state', () => {
+      toggleButton.create('bottom-right')
+
+      expect(() => {
+        toggleButton.setSelectMode(true)
+        toggleButton.setSelectMode(false)
+      }).not.toThrow()
+    })
+  })
+
   describe('destroy', () => {
     it('removes host element from DOM', () => {
       toggleButton.create('bottom-right')

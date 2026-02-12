@@ -36,3 +36,10 @@ coverage/
 .cache/
 .eslintcache
 .parcel-cache/
+
+# Playwright
+test-results/
+playwright-report/
+
+# Conductor
+.context/

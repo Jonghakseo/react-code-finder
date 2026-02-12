@@ -5,6 +5,7 @@ declare global {
     __REACT_CODE_FINDER__: Inspector
     __REACT_CODE_FINDER_OPTIONS__?: {
       buttonPosition?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
+      outputFormat?: 'xml' | 'plain'
     }
   }
 }
@@ -15,6 +16,7 @@ if (typeof window !== 'undefined') {
     window.__REACT_CODE_FINDER__ = new Inspector({
       enabled: true,
       buttonPosition: options.buttonPosition || 'bottom-right',
+      outputFormat: options.outputFormat || 'xml',
     })
     window.__REACT_CODE_FINDER__.init()
   }

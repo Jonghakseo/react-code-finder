@@ -48,9 +48,16 @@ export class ToggleButton {
     this.isActive = active
     if (this.button) {
       this.button.classList.toggle('rcf-btn-active', active)
+      this.button.classList.remove('rcf-btn-select')
       this.button.title = active
         ? 'Click to disable inspector'
         : 'Click to enable inspector'
+    }
+  }
+
+  setSelectMode(active: boolean): void {
+    if (this.button) {
+      this.button.classList.toggle('rcf-btn-select', active)
     }
   }
 
@@ -103,6 +110,12 @@ export class ToggleButton {
       }
       .rcf-btn.rcf-btn-active:hover {
         background: #2563eb;
+      }
+      .rcf-btn.rcf-btn-select {
+        background: #f59e0b;
+      }
+      .rcf-btn.rcf-btn-select:hover {
+        background: #d97706;
       }
       .rcf-btn svg {
         width: 24px;
