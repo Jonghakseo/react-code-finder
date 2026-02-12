@@ -99,19 +99,6 @@ export function findUserComponentFiber(fiber: Fiber, skipAnonymous: boolean): Fi
   let current: Fiber | null = fiber
 
   while (current) {
-    if (typeof current.type === 'string') {
-      const debugOwner = current._debugOwner as DebugOwner | Fiber | null
-      if (debugOwner && 'env' in debugOwner && (debugOwner as DebugOwner).env === 'Server') {
-        return current
-      }
-      if (current._debugOwner && 'type' in current._debugOwner) {
-        current = current._debugOwner as Fiber
-      } else {
-        current = current.return
-      }
-      continue
-    }
-
     const name = getFiberTypeName(current)
     if (skipAnonymous && (name === 'Anonymous' || name === 'Unknown')) {
       if (current._debugOwner && 'type' in current._debugOwner) {
@@ -265,15 +252,14 @@ export function getComponentStack(fiber: Fiber, maxDepth: number, skipAnonymous:
       break
     }
 
-    if (typeof current.type !== 'string') {
-      const source = getSourceFromDebugInfo(current)
-      if (source && !source.fileName.includes('node_modules')) {
-        const name = getFiberTypeName(current)
-        const shouldSkip = skipAnonymous && (name === 'Unknown' || name === 'Anonymous')
-        if (!shouldSkip && !seenNames.has(name)) {
-          seenNames.add(name)
-          stack.push({ name, source, props: serializeProps(current.pendingProps) })
-        }
+    const source = getSourceFromDebugInfo(current)
+    if (source && !source.fileName.includes('node_modules')) {
+      const name = getComponentName(current)
+      const isUnresolved = typeof current.type === 'string' && name === current.type
+      const shouldSkip = isUnresolved || (skipAnonymous && (name === 'Unknown' || name === 'Anonymous'))
+      if (!shouldSkip && !seenNames.has(name)) {
+        seenNames.add(name)
+        stack.push({ name, source, props: serializeProps(current.pendingProps) })
       }
     }
 

@@ -204,17 +204,14 @@ describe('findUserComponentFiber', () => {
     expect(findUserComponentFiber(fiber, false)).toBe(fiber)
   })
 
-  it('skips native elements and finds parent component', () => {
-    function Card() {}
-    const cardSource = createMockSource('/src/Card.tsx')
-    const cardFiber = createMockFiber({ type: Card, _debugSource: cardSource })
+  it('returns native element with source info', () => {
+    const source = createMockSource('/src/Card.tsx', 10)
     const divFiber = createMockFiber({
       type: 'div',
-      _debugSource: createMockSource('/src/Card.tsx', 10),
-      _debugOwner: cardFiber,
+      _debugSource: source,
     })
 
-    expect(findUserComponentFiber(divFiber, false)).toBe(cardFiber)
+    expect(findUserComponentFiber(divFiber, false)).toBe(divFiber)
   })
 
   it('skips fibers with node_modules path', () => {
