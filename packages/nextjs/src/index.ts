@@ -68,7 +68,7 @@ export function withReactCodeFinder(options: ReactCodeFinderOptions = {}) {
                 ? await originalEntry()
                 : originalEntry
 
-            const optionsScript = `data:text/javascript,window.__REACT_CODE_FINDER_OPTIONS__=${JSON.stringify({ buttonPosition, outputFormat })};window.__RCF_SOURCE_ENDPOINT__='http://localhost:${SOURCE_SERVER_PORT}/source';`
+            const optionsScript = `data:text/javascript,window.__REACT_CODE_FINDER_OPTIONS__=${JSON.stringify({ buttonPosition, outputFormat })};window.__RCF_SOURCE_ENDPOINT__='http://localhost:${SOURCE_SERVER_PORT}/source';window.__RCF_PROJECT_ROOT__='${process.cwd().replace(/\\/g, '\\\\').replace(/'/g, "\\'")}';`
 
             const hasClientEntry = (entry: string) =>
               entry.includes('client-entry') || entry.includes('__REACT_CODE_FINDER_OPTIONS__')

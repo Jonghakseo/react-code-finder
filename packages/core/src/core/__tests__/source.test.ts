@@ -197,10 +197,24 @@ describe('getComponentName', () => {
 
 describe('findUserComponentFiber', () => {
   it('returns fiber with source info', () => {
+    function MyComponent() {}
     const source = createMockSource()
-    const fiber = createMockFiber({ _debugSource: source })
+    const fiber = createMockFiber({ type: MyComponent, _debugSource: source })
 
     expect(findUserComponentFiber(fiber, false)).toBe(fiber)
+  })
+
+  it('skips native elements and finds parent component', () => {
+    function Card() {}
+    const cardSource = createMockSource('/src/Card.tsx')
+    const cardFiber = createMockFiber({ type: Card, _debugSource: cardSource })
+    const divFiber = createMockFiber({
+      type: 'div',
+      _debugSource: createMockSource('/src/Card.tsx', 10),
+      _debugOwner: cardFiber,
+    })
+
+    expect(findUserComponentFiber(divFiber, false)).toBe(cardFiber)
   })
 
   it('skips fibers with node_modules path', () => {
@@ -270,7 +284,7 @@ describe('findUserComponentFiber', () => {
     expect(findUserComponentFiber(internalFiber, false)).toBe(userFiber)
   })
 
-  it('returns fiber with RSC DebugOwner (env=Server)', () => {
+  it('returns native element fiber with RSC DebugOwner (env=Server)', () => {
     const fiber = createMockFiber({
       type: 'div',
       _debugOwner: { env: 'Server', name: 'ServerComponent' } as unknown as Fiber,

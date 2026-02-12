@@ -29,7 +29,7 @@ describe('fetchSourceCode', () => {
 
     expect(result).toEqual(mockResponse)
     expect(globalThis.fetch).toHaveBeenCalledWith(
-      expect.stringContaining('/__rcf/source?file=src%2FApp.tsx&line=10&context=15')
+      expect.stringContaining('/__rcf/source?file=src%2FApp.tsx&line=10&context=5')
     )
   })
 

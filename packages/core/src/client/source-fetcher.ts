@@ -8,7 +8,7 @@ export interface SourceSnippet {
 export async function fetchSourceCode(
   fileName: string,
   lineNumber: number,
-  contextLines: number = 15
+  contextLines: number = 5
 ): Promise<SourceSnippet | null> {
   const baseUrl = getSourceEndpoint()
 

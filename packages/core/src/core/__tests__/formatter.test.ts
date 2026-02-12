@@ -66,7 +66,7 @@ describe('formatOutput - XML', () => {
     expect(result).toContain('<parent name="Card"')
   })
 
-  it('formats parent with source as non-self-closing tag', () => {
+  it('formats parent without source even when source is available', () => {
     const stack = [
       createStackItem('Button', 'src/Button.tsx', 42),
       createStackItem('Card', 'src/Card.tsx', 20),
@@ -75,8 +75,9 @@ describe('formatOutput - XML', () => {
     const result = formatOutput(stack, sources, 'xml')
 
     expect(result).toContain('<parent name="Card"')
-    expect(result).toContain('function Card() {}')
-    expect(result).toContain('</parent>')
+    expect(result).toContain('/>')
+    expect(result).not.toContain('function Card() {}')
+    expect(result).not.toContain('</parent>')
   })
 
   it('formats parent without source as self-closing tag', () => {

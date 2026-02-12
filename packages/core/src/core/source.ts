@@ -1,5 +1,6 @@
 import type { Fiber, SourceLocation } from './types'
 import { serializeProps, formatProps, type SerializedProps } from './props'
+import { toRelativePath } from './path'
 
 interface DebugOwner {
   name?: string
@@ -98,8 +99,20 @@ export function findUserComponentFiber(fiber: Fiber, skipAnonymous: boolean): Fi
   let current: Fiber | null = fiber
 
   while (current) {
+    if (typeof current.type === 'string') {
+      const debugOwner = current._debugOwner as DebugOwner | Fiber | null
+      if (debugOwner && 'env' in debugOwner && (debugOwner as DebugOwner).env === 'Server') {
+        return current
+      }
+      if (current._debugOwner && 'type' in current._debugOwner) {
+        current = current._debugOwner as Fiber
+      } else {
+        current = current.return
+      }
+      continue
+    }
+
     const name = getFiberTypeName(current)
-    // Skip anonymous/unknown components if skipAnonymous is enabled
     if (skipAnonymous && (name === 'Anonymous' || name === 'Unknown')) {
       if (current._debugOwner && 'type' in current._debugOwner) {
         current = current._debugOwner as Fiber
@@ -109,7 +122,6 @@ export function findUserComponentFiber(fiber: Fiber, skipAnonymous: boolean): Fi
       continue
     }
 
-    // First, try to find fiber with source info
     const source = getSourceFromDebugInfo(current)
     if (source && !source.fileName.includes('node_modules')) {
       return current
@@ -196,7 +208,8 @@ function getSourceFromDebugInfo(fiber: Fiber): SourceLocation | null {
 }
 
 export function formatSourceLocation(source: SourceLocation): string {
-  const { fileName, lineNumber, columnNumber } = source
+  const { lineNumber, columnNumber } = source
+  const fileName = toRelativePath(source.fileName)
   if (lineNumber === 0) {
     return fileName
   }
@@ -252,14 +265,15 @@ export function getComponentStack(fiber: Fiber, maxDepth: number, skipAnonymous:
       break
     }
 
-    // Client component: add to stack if has source
-    const source = getSourceFromDebugInfo(current)
-    if (source && !source.fileName.includes('node_modules')) {
-      const name = getFiberTypeName(current)
-      const shouldSkip = skipAnonymous && (name === 'Unknown' || name === 'Anonymous')
-      if (!shouldSkip && !seenNames.has(name)) {
-        seenNames.add(name)
-        stack.push({ name, source, props: serializeProps(current.pendingProps) })
+    if (typeof current.type !== 'string') {
+      const source = getSourceFromDebugInfo(current)
+      if (source && !source.fileName.includes('node_modules')) {
+        const name = getFiberTypeName(current)
+        const shouldSkip = skipAnonymous && (name === 'Unknown' || name === 'Anonymous')
+        if (!shouldSkip && !seenNames.has(name)) {
+          seenNames.add(name)
+          stack.push({ name, source, props: serializeProps(current.pendingProps) })
+        }
       }
     }
 

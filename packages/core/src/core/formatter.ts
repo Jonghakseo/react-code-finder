@@ -3,6 +3,7 @@ import type { ComponentTreeNode } from './area-selection'
 import type { SourceSnippet } from '../client/source-fetcher'
 import { formatSourceLocation } from './source'
 import { formatProps } from './props'
+import { toRelativePath } from './path'
 
 export type OutputFormat = 'xml' | 'plain'
 
@@ -36,7 +37,7 @@ function formatXmlOutput(
 
   const primaryAttrs: string[] = [`name="${escapeXml(primary.name)}"`]
   if (primary.source) {
-    primaryAttrs.push(`file="${escapeXml(primary.source.fileName)}"`)
+    primaryAttrs.push(`file="${escapeXml(toRelativePath(primary.source.fileName))}"`)
     if (primary.source.lineNumber > 0) {
       primaryAttrs.push(`line="${primary.source.lineNumber}"`)
     }
@@ -50,7 +51,7 @@ function formatXmlOutput(
   const primarySource = primary.source ? sources.get(primary.source.fileName) : null
   if (primarySource) {
     lines.push(
-      `  <source file="${escapeXml(primary.source!.fileName)}" lines="${primarySource.startLine}-${primarySource.endLine}">`
+      `  <source file="${escapeXml(toRelativePath(primary.source!.fileName))}" lines="${primarySource.startLine}-${primarySource.endLine}">`
     )
     lines.push(primarySource.content)
     lines.push('  </source>')
@@ -59,7 +60,7 @@ function formatXmlOutput(
   for (const parent of parents) {
     const attrs: string[] = [`name="${escapeXml(parent.name)}"`]
     if (parent.source) {
-      attrs.push(`file="${escapeXml(parent.source.fileName)}"`)
+      attrs.push(`file="${escapeXml(toRelativePath(parent.source.fileName))}"`)
       if (parent.source.lineNumber > 0) {
         attrs.push(`line="${parent.source.lineNumber}"`)
       }
@@ -67,19 +68,7 @@ function formatXmlOutput(
     if (parent.props) {
       attrs.push(`props="${escapeXml(formatProps(parent.props))}"`)
     }
-
-    const parentSource = parent.source ? sources.get(parent.source.fileName) : null
-    if (parentSource) {
-      lines.push(`  <parent ${attrs.join(' ')}>`)
-      lines.push(
-        `    <source file="${escapeXml(parent.source!.fileName)}" lines="${parentSource.startLine}-${parentSource.endLine}">`
-      )
-      lines.push(parentSource.content)
-      lines.push('    </source>')
-      lines.push('  </parent>')
-    } else {
-      lines.push(`  <parent ${attrs.join(' ')} />`)
-    }
+    lines.push(`  <parent ${attrs.join(' ')} />`)
   }
 
   lines.push('</component>')
@@ -101,16 +90,11 @@ function formatPlainOutput(
     })
     .join('\n')
 
-  if (sources.size === 0) return stackText
+  const primary = stack[0]
+  const primarySource = primary?.source ? sources.get(primary.source.fileName) : null
+  if (!primarySource) return stackText
 
-  const sourceTexts = Array.from(sources.entries())
-    .map(
-      ([file, snippet]) =>
-        `\n--- ${file} (lines ${snippet.startLine}-${snippet.endLine}) ---\n${snippet.content}`
-    )
-    .join('\n')
-
-  return stackText + '\n' + sourceTexts
+  return stackText + `\n\n--- ${toRelativePath(primary.source!.fileName)} (lines ${primarySource.startLine}-${primarySource.endLine}) ---\n${primarySource.content}`
 }
 
 export function formatComponentTree(
@@ -135,7 +119,7 @@ function formatTreeXml(
     .map((node) => {
       const attrs: string[] = [`name="${escapeXml(node.name)}"`]
       if (node.source) {
-        attrs.push(`file="${escapeXml(node.source.fileName)}"`)
+        attrs.push(`file="${escapeXml(toRelativePath(node.source.fileName))}"`)
         if (node.source.lineNumber > 0) {
           attrs.push(`line="${node.source.lineNumber}"`)
         }
@@ -156,7 +140,7 @@ function formatTreeXml(
       const sourceSnippet = node.source ? sources.get(node.source.fileName) : null
       if (sourceSnippet) {
         lines.push(
-          `${pad}  <source file="${escapeXml(node.source!.fileName)}" lines="${sourceSnippet.startLine}-${sourceSnippet.endLine}">`
+          `${pad}  <source file="${escapeXml(toRelativePath(node.source!.fileName))}" lines="${sourceSnippet.startLine}-${sourceSnippet.endLine}">`
         )
         lines.push(sourceSnippet.content)
         lines.push(`${pad}  </source>`)

@@ -290,27 +290,14 @@ export class Inspector {
 
   private async fetchSourceAndCopy(stack: ReturnType<typeof getComponentStack>): Promise<void> {
     const sources = new Map<string, SourceSnippet>()
-    const fileNames = new Set<string>()
+    const primary = stack[0]
 
-    for (const item of stack) {
-      if (item.source && !fileNames.has(item.source.fileName)) {
-        fileNames.add(item.source.fileName)
+    if (primary?.source) {
+      const snippet = await fetchSourceCode(primary.source.fileName, primary.source.lineNumber)
+      if (snippet) {
+        sources.set(primary.source.fileName, snippet)
       }
     }
-
-    const fetchPromises = Array.from(fileNames).map(async (fileName) => {
-      const item = stack.find((s) => s.source?.fileName === fileName)
-      if (!item?.source) return
-      const snippet = await fetchSourceCode(
-        item.source.fileName,
-        item.source.lineNumber
-      )
-      if (snippet) {
-        sources.set(item.source.fileName, snippet)
-      }
-    })
-
-    await Promise.all(fetchPromises)
 
     const output = formatOutput(stack, sources, this.options.outputFormat)
 

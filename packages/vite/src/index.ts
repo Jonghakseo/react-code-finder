@@ -26,6 +26,7 @@ export function reactCodeFinder(options: ReactCodeFinderOptions = {}): Plugin {
   const { enabled = true, buttonPosition = 'bottom-right', outputFormat = 'xml' } = options
   let clientBundle: string | null = null
   let isServe = false
+  let projectRoot = ''
 
   return {
     name: 'react-code-finder',
@@ -33,6 +34,7 @@ export function reactCodeFinder(options: ReactCodeFinderOptions = {}): Plugin {
 
     configResolved(config) {
       isServe = config.command === 'serve'
+      projectRoot = config.root
     },
 
     configureServer(server: ViteDevServer) {
@@ -107,6 +109,7 @@ export function reactCodeFinder(options: ReactCodeFinderOptions = {}): Plugin {
             tag: 'script',
             children: `
               ${bundle}
+              if (typeof window !== 'undefined') { window.__RCF_PROJECT_ROOT__ = '${projectRoot.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'; }
               if (typeof window !== 'undefined' && window.ReactCodeFinder) {
                 var initCodeFinder = function() {
                   window.__REACT_CODE_FINDER_INSTANCE__ = window.ReactCodeFinder.init({
